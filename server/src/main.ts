@@ -7,7 +7,7 @@ async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
   const configService = app.get(ConfigService);
-  const port = configService.get<number>('PORT', 3000);
+  const port = configService.get<number>('PORT', 8080);
   app.setGlobalPrefix('api/v1');
 
   //swagger 자동화
@@ -58,7 +58,7 @@ async function bootstrap() {
   app.enableCors({
     origin:
       configService.get<string>('NODE_ENV') === 'production'
-        ? ['https://your-frontend-domain.com']
+        ? ['http://localhost:3000']
         : true,
     credentials: true,
   });

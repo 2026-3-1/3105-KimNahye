@@ -9,6 +9,8 @@ import {
   HttpExceptionFilter,
   AllExceptionFilter,
 } from './common/filters/exception.filter';
+import { CoursesModule } from './courses/courses.module';
+import { VideosModule } from './videos/videos.module';
 
 @Module({
   imports: [
@@ -35,6 +37,8 @@ import {
 
     AuthModule,
     UsersModule,
+    CoursesModule,
+    VideosModule,
   ],
   providers: [
     // 전역 ValidationPipe
