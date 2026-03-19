@@ -30,12 +30,6 @@ export class HttpExceptionFilter implements ExceptionFilter {
       message: Array.isArray(message) ? message[0] : message,
       data: null,
     });
-
-    response.status(status).json({
-      statusCode: status,
-      message: Array.isArray(message) ? message[0] : message,
-      data: null,
-    });
   }
 }
 
