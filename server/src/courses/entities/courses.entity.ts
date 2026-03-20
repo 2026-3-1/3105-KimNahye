@@ -29,4 +29,6 @@ export class Courses {
 
   @Column({ type: 'jsonb' })
   requiredTools: string[];
+
+  videoCount?: number;
 }
