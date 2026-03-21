@@ -1,10 +1,12 @@
 import { User } from 'src/user/entities/user.entity';
 import {
   Column,
+  CreateDateColumn,
   Entity,
   ManyToOne,
   OneToMany,
   PrimaryGeneratedColumn,
+  UpdateDateColumn,
 } from 'typeorm';
 import { Videos } from '../../videos/entities/videos.entity';
 import { Category } from './enums/category.enum';
@@ -12,8 +14,8 @@ import { Difficulty } from './enums/difficulty.enum';
 
 @Entity()
 export class Courses {
-  @PrimaryGeneratedColumn()
-  id: 'uuid';
+  @PrimaryGeneratedColumn('uuid')
+  id: string;
 
   @ManyToOne(() => User, (user) => user.courses, { nullable: false })
   teacher: User;
@@ -31,4 +33,20 @@ export class Courses {
   requiredTools: string[];
 
   videoCount?: number;
+
+  totalDuration?: number;
+
+  @CreateDateColumn()
+  createdAt: Date;
+
+  @UpdateDateColumn()
+  updatedAt: Date;
+
+  get computedVideoCount(): number {
+    return this.videos?.length ?? 0;
+  }
+
+  get computedTotalDuration(): number {
+    return this.videos?.reduce((sum, video) => sum + video.duration, 0) ?? 0;
+  }
 }

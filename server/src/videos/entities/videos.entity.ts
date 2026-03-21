@@ -15,13 +15,10 @@ export class Videos {
   id: string;
 
   @Column({ nullable: false })
-  youtubeVideoId: string;
+  youtubeVideoId: string; // youtube 연결용
 
   @Column({ nullable: false })
   title: string;
-
-  @Column({ nullable: false })
-  url: string;
 
   @Column({ nullable: false })
   duration: number;

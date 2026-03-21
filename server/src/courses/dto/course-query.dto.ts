@@ -1,7 +1,8 @@
-import { IsEnum, IsNumber, IsOptional, IsString } from 'class-validator';
+import { IsEnum, IsNumber, IsOptional } from 'class-validator';
 import { Category } from '../entities/enums/category.enum';
 import { Difficulty } from '../entities/enums/difficulty.enum';
 import { ApiPropertyOptional } from '@nestjs/swagger';
+import { Transform } from 'class-transformer';
 
 export class CourseQueryDto {
   @IsOptional()
@@ -15,12 +16,14 @@ export class CourseQueryDto {
   difficulty?: Difficulty;
 
   @IsOptional()
-  @IsString()
-  tools?: string;
+  @Transform(({ value }: { value: string | string[] }) =>
+    Array.isArray(value) ? value : [value],
+  )
+  requiredTools?: string[];
 
   @IsOptional()
   @IsNumber()
-  max_duration?: number;
+  duration?: number;
 
   @IsOptional()
   @IsNumber()

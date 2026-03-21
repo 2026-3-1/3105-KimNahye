@@ -1,4 +1,4 @@
-import { Inject, Injectable } from '@nestjs/common';
+import { Inject, Injectable, NotFoundException } from '@nestjs/common';
 import {
   COURSES_REPOSITORY,
   ICoursesRepository,
@@ -6,6 +6,9 @@ import {
 
 import { CourseQueryDto } from './dto/course-query.dto';
 import { CourseListResponse } from './dto/course-list-response.dto';
+import { CourseDetailResponse } from './dto/course-detail.response.dto';
+import { Courses } from './entities/courses.entity';
+import { VideoItem } from './dto/video-item.dto';
 
 @Injectable()
 export class CoursesService {
@@ -17,13 +20,13 @@ export class CoursesService {
   async getCourseList(
     dto: CourseQueryDto,
   ): Promise<CourseListResponse[] | null> {
-    const { category, difficulty, tools, max_duration, page, limit } = dto;
+    const { category, difficulty, requiredTools, duration, page, limit } = dto;
 
     const courseList = await this.coursesRepository.findByQuery(
       category,
       difficulty,
-      tools,
-      max_duration,
+      requiredTools,
+      duration,
       page,
       limit,
     );
@@ -36,10 +39,39 @@ export class CoursesService {
         id: course.teacher.id,
         name: course.teacher.nickname,
       },
-      videoCount: course.videoCount ?? 0,
+      videoCount: course.computedVideoCount ?? 0,
       category: course.category,
       difficulty: course.difficulty,
       requiredTools: course.requiredTools,
     }));
+  }
+
+  async getCourseDetail(id: string): Promise<CourseDetailResponse> {
+    const course = (await this.coursesRepository.findById(id)) as Courses;
+
+    if (!course) {
+      throw new NotFoundException('강의를 찾을 수 없습니다.');
+    }
+
+    const videoItems: VideoItem[] = course.videos.map((video) => ({
+      id: video.id,
+      title: video.title,
+      duration: video.duration,
+    }));
+    return {
+      id: course.id,
+      teacher: {
+        id: course.teacher.id,
+        name: course.teacher.nickname,
+      },
+      videos: videoItems,
+      category: course.category,
+      difficulty: course.difficulty,
+      requiredTools: course.requiredTools,
+      videoCount: course.computedVideoCount ?? 0,
+      totalDuration: course.computedTotalDuration ?? 0,
+      createdAt: course.createdAt,
+      updatedAt: course.updatedAt,
+    };
   }
 }

@@ -1,9 +1,20 @@
-import { Controller, Get, HttpCode, HttpStatus, Query } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  HttpCode,
+  HttpStatus,
+  Param,
+  Query,
+} from '@nestjs/common';
 import { CoursesService } from './courses.service';
-import { ApiGetCourseList } from './decorators/course-swagger.decorator';
+import {
+  ApiGetCourseDetail,
+  ApiGetCourseList,
+} from './decorators/course-swagger.decorator';
 import { CourseQueryDto } from './dto/course-query.dto';
 import { ApiResponseDto } from '@common/dto/api-response.dto';
 import { CourseListResponse } from './dto/course-list-response.dto';
+import { CourseDetailResponse } from './dto/course-detail.response.dto';
 
 @Controller('courses')
 export class CoursesController {
@@ -16,9 +27,24 @@ export class CoursesController {
     @Query() dto: CourseQueryDto,
   ): Promise<ApiResponseDto<CourseListResponse[] | null>> {
     const data = await this.coursesService.getCourseList(dto);
+
     return ApiResponseDto.success(
       data,
       '강의 목록 조회에 성공하였습니다.',
+      HttpStatus.OK,
+    );
+  }
+
+  @Get('/:id')
+  @HttpCode(HttpStatus.OK)
+  @ApiGetCourseDetail()
+  async getCourseDetail(
+    @Param('id') id: string,
+  ): Promise<ApiResponseDto<CourseDetailResponse>> {
+    const data = await this.coursesService.getCourseDetail(id);
+    return ApiResponseDto.success(
+      data,
+      '강의 상세 조회에 성공하였습니다.',
       HttpStatus.OK,
     );
   }

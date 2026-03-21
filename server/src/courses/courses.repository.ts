@@ -16,26 +16,44 @@ export class CoursesRepository implements ICoursesRepository {
   async findByQuery(
     category?: Category,
     difficulty?: Difficulty,
-    tools?: string,
-    max_duration?: number,
+    requiredTools?: string[],
+    duration?: number,
     page?: number,
     limit?: number,
   ): Promise<Courses[] | null> {
     const qb = this.repo
       .createQueryBuilder('course')
-      .loadRelationCountAndMap('course.videoCount', 'course.videos');
+      .leftJoinAndSelect('course.teacher', 'teacher')
+      .leftJoinAndSelect('course.videos', 'videos');
 
     if (category) qb.andWhere('course.category = :category', { category });
     if (difficulty)
       qb.andWhere('course.difficulty = :difficulty', { difficulty });
-    if (tools) qb.andWhere('course.tools = :tools', { tools });
-    if (max_duration)
-      qb.andWhere('course.max_duration <= :max_duration', { max_duration });
-
+    if (requiredTools)
+      qb.andWhere('course.requiredTools @> CAST(:requiredTools AS jsonb)', {
+        requiredTools: JSON.stringify(requiredTools),
+      });
+    if (duration) {
+      qb.andWhere(
+        `(SELECT SUM(v.duration) FROM videos v WHERE v."courseId" = course.id) <= :duration`,
+        { duration },
+      );
+    }
     const currentPage = page ?? 1;
     const currentLimit = limit ?? 10;
     qb.skip((currentPage - 1) * currentLimit).take(currentLimit);
 
     return qb.getMany();
+  }
+
+  async findById(id: string): Promise<Courses | null> {
+    const result = await this.repo.findOne({
+      where: { id },
+      relations: {
+        videos: true,
+        teacher: true,
+      },
+    });
+    return result;
   }
 }
