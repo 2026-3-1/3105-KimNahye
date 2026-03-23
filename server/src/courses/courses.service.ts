@@ -80,17 +80,13 @@ export class CoursesService {
   async getCourseListByUser(
     userId: string,
   ): Promise<CourseListResponse[] | null> {
-    console.log('service 입장');
     const user = await this.usersService.findById(userId);
-    console.log('여기까지 됨 1');
     if (!user) {
       throw new NotFoundException('유저가 존재하지 않습니다.');
     }
-    console.log('여기까지 됨 2');
     const courseList = user.courses;
 
     if (!courseList) return null;
-    console.log('여기까지 됨 3');
 
     return courseList.map((course) => ({
       id: course.id,
