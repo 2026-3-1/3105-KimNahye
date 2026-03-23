@@ -2,7 +2,7 @@ import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { PassportStrategy } from '@nestjs/passport';
 import { ExtractJwt, Strategy } from 'passport-jwt';
 import { ConfigService } from '@nestjs/config';
-import { UsersService } from '../../user/user.service';
+import { UserService } from '../../user/user.service';
 import { JwtPayload } from '../interfaces/jwt-payload.interface';
 import { User } from '../../user/entities/user.entity';
 
@@ -13,7 +13,7 @@ export class JwtAccessStrategy extends PassportStrategy(
 ) {
   constructor(
     private readonly configService: ConfigService,
-    private readonly usersService: UsersService,
+    private readonly userService: UserService,
   ) {
     super({
       jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
@@ -27,7 +27,7 @@ export class JwtAccessStrategy extends PassportStrategy(
       throw new UnauthorizedException('액세스 토큰이 아닙니다.');
     }
 
-    const user = await this.usersService.findById(payload.sub);
+    const user = await this.userService.findById(payload.sub);
     if (!user) {
       throw new UnauthorizedException('존재하지 않는 사용자입니다.');
     }

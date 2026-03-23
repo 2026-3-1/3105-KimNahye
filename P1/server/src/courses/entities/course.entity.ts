@@ -8,20 +8,24 @@ import {
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
-import { Videos } from '../../videos/entities/videos.entity';
+import { Video } from '../../videos/entities/video.entity';
 import { Category } from './enums/category.enum';
 import { Difficulty } from './enums/difficulty.enum';
+import { Enrollment } from 'src/enrollments/entities/enrollment.entity';
 
-@Entity()
-export class Courses {
+@Entity('courses')
+export class Course {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
   @ManyToOne(() => User, (user) => user.courses, { nullable: false })
   teacher: User;
 
-  @OneToMany(() => Videos, (video) => video.course)
-  videos: Videos[];
+  @OneToMany(() => Video, (video) => video.course)
+  videos: Video[];
+
+  @OneToMany(() => Enrollment, (enrollment) => enrollment.course)
+  enrollments: Enrollment[];
 
   @Column()
   category: Category;

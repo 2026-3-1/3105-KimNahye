@@ -4,13 +4,14 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { APP_FILTER, APP_PIPE } from '@nestjs/core';
 import { ValidationPipe } from '@nestjs/common';
 import { AuthModule } from './auth/auth.module';
-import { UsersModule } from './user/user.module';
+import { UserModule } from './user/user.module';
 import {
   HttpExceptionFilter,
   AllExceptionFilter,
 } from './common/filters/exception.filter';
-import { CoursesModule } from './courses/courses.module';
-import { VideosModule } from './videos/videos.module';
+import { CourseModule } from './courses/course.module';
+import { VideosModule } from './videos/video.module';
+import { EnrollmentsModule } from './enrollments/enrollment.module';
 
 @Module({
   imports: [
@@ -36,9 +37,10 @@ import { VideosModule } from './videos/videos.module';
     }),
 
     AuthModule,
-    UsersModule,
-    CoursesModule,
+    UserModule,
+    CourseModule,
     VideosModule,
+    EnrollmentsModule,
   ],
   providers: [
     // 전역 ValidationPipe

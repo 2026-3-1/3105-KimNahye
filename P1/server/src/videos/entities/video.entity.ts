@@ -7,10 +7,10 @@ import {
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
-import { Courses } from '../../courses/entities/courses.entity';
+import { Course } from '../../courses/entities/course.entity';
 
-@Entity()
-export class Videos {
+@Entity('videos')
+export class Video {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
@@ -26,8 +26,8 @@ export class Videos {
   @ManyToOne(() => User, (user) => user.videos, { nullable: false })
   teacher: User;
 
-  @ManyToOne(() => Courses, (course) => course.videos, { nullable: false })
-  course: Courses;
+  @ManyToOne(() => Course, (course) => course.videos, { nullable: false })
+  course: Course;
 
   @CreateDateColumn()
   createdAt: Date;

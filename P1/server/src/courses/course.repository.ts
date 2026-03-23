@@ -1,16 +1,16 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Courses } from './entities/courses.entity';
+import { Course } from './entities/course.entity';
 import { Repository } from 'typeorm';
-import { ICoursesRepository } from './interfaces/courses-repository.interface';
+import { ICourseRepository } from './interfaces/courses-repository.interface';
 import { Category } from './entities/enums/category.enum';
 import { Difficulty } from './entities/enums/difficulty.enum';
 
 @Injectable()
-export class CoursesRepository implements ICoursesRepository {
+export class CourseRepository implements ICourseRepository {
   constructor(
-    @InjectRepository(Courses)
-    private readonly repo: Repository<Courses>,
+    @InjectRepository(Course)
+    private readonly repo: Repository<Course>,
   ) {}
 
   async findByQuery(
@@ -20,7 +20,7 @@ export class CoursesRepository implements ICoursesRepository {
     duration?: number,
     page?: number,
     limit?: number,
-  ): Promise<Courses[] | null> {
+  ): Promise<Course[] | null> {
     const qb = this.repo
       .createQueryBuilder('course')
       .leftJoinAndSelect('course.teacher', 'teacher')
@@ -46,7 +46,7 @@ export class CoursesRepository implements ICoursesRepository {
     return qb.getMany();
   }
 
-  async findById(id: string): Promise<Courses | null> {
+  async findById(id: string): Promise<Course | null> {
     const result = await this.repo.findOne({
       where: { id },
       relations: {
@@ -54,6 +54,7 @@ export class CoursesRepository implements ICoursesRepository {
         teacher: true,
       },
     });
+
     return result;
   }
 }

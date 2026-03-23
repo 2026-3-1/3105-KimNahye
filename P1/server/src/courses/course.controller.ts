@@ -4,14 +4,16 @@ import {
   HttpCode,
   HttpStatus,
   Param,
+  Post,
   Query,
   UseGuards,
 } from '@nestjs/common';
-import { CoursesService } from './courses.service';
+import { CourseService } from './course.service';
 import {
   ApiGetCourseDetail,
   ApiGetCourseList,
   ApiGetCourseListByUser,
+  ApiRegistration,
 } from './decorators/course-swagger.decorator';
 import { CourseQueryDto } from './dto/course-query.dto';
 import { ApiResponseDto } from '@common/dto/api-response.dto';
@@ -22,8 +24,8 @@ import { JwtAccessGuard } from '@auth/guards/jwt-access.guard';
 import { ApiBearerAuth } from '@nestjs/swagger';
 
 @Controller('courses')
-export class CoursesController {
-  constructor(private readonly coursesService: CoursesService) {}
+export class CourseController {
+  constructor(private readonly courseService: CourseService) {}
 
   @Get('list')
   @ApiBearerAuth('access-token')
@@ -33,7 +35,7 @@ export class CoursesController {
   async getCourseList(
     @Query() dto: CourseQueryDto,
   ): Promise<ApiResponseDto<CourseListResponse[] | null>> {
-    const data = await this.coursesService.getCourseList(dto);
+    const data = await this.courseService.getCourseList(dto);
 
     return ApiResponseDto.success(
       data,
@@ -50,7 +52,7 @@ export class CoursesController {
   async getCourseListByUser(
     @GetUser('id') userId: string,
   ): Promise<ApiResponseDto<CourseListResponse[] | null>> {
-    const data = await this.coursesService.getCourseListByUser(userId);
+    const data = await this.courseService.getCourseListByUser(userId);
     return ApiResponseDto.success(
       data,
       '내 강의 목록 조회에 성공하였습니다.',
@@ -66,7 +68,7 @@ export class CoursesController {
   async getCourseDetail(
     @Param('id') id: string,
   ): Promise<ApiResponseDto<CourseDetailResponse>> {
-    const data = await this.coursesService.getCourseDetail(id);
+    const data = await this.courseService.getCourseDetail(id);
     return ApiResponseDto.success(
       data,
       '강의 상세 조회에 성공하였습니다.',

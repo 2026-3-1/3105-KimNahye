@@ -4,7 +4,7 @@ import {
   UnauthorizedException,
 } from '@nestjs/common';
 
-import { UsersService } from 'src/user/user.service';
+import { UserService } from 'src/user/user.service';
 import {
   LoginRequestDto,
   RegisterRequestDto,
@@ -20,7 +20,7 @@ import { TokenService } from './token.service';
 @Injectable()
 export class AuthService {
   constructor(
-    private readonly usersService: UsersService,
+    private readonly userService: UserService,
     private readonly tokenService: TokenService,
     private readonly refreshTokenService: RefreshTokenService,
   ) {}
@@ -29,12 +29,12 @@ export class AuthService {
   // 회원가입
   // ─────────────────────────────────────────────
   async register(dto: RegisterRequestDto): Promise<RegisterResponseDto> {
-    const existing = await this.usersService.findByEmail(dto.email);
+    const existing = await this.userService.findByEmail(dto.email);
     if (existing) {
       throw new ConflictException('이미 사용 중인 이메일입니다.');
     }
 
-    const user = await this.usersService.create({
+    const user = await this.userService.create({
       email: dto.email,
       password: dto.password,
       nickname: dto.nickname,
@@ -53,7 +53,7 @@ export class AuthService {
   // 로그인
   // ─────────────────────────────────────────────
   async login(dto: LoginRequestDto): Promise<TokenResponseDto> {
-    const user = await this.usersService.findByEmailWithPassword(dto.email);
+    const user = await this.userService.findByEmailWithPassword(dto.email);
     if (!user) {
       throw new UnauthorizedException(
         '이메일 또는 비밀번호가 올바르지 않습니다.',

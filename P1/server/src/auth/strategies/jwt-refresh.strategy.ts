@@ -2,7 +2,7 @@ import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { PassportStrategy } from '@nestjs/passport';
 import { ExtractJwt, Strategy, StrategyOptionsWithRequest } from 'passport-jwt';
 import { Request } from 'express';
-import { UsersService } from 'src/user/user.service';
+import { UserService } from 'src/user/user.service';
 import { JwtPayload } from '../interfaces/jwt-payload.interface';
 import { User } from 'src/user/entities/user.entity';
 import { RefreshTokenService } from '@auth/services/refresh-token.service';
@@ -16,7 +16,7 @@ export class JwtRefreshStrategy extends PassportStrategy(
   constructor(
     private readonly refreshTokenService: RefreshTokenService,
     private readonly configService: ConfigService,
-    private readonly usersService: UsersService,
+    private readonly userService: UserService,
   ) {
     const options: StrategyOptionsWithRequest = {
       jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
@@ -45,7 +45,7 @@ export class JwtRefreshStrategy extends PassportStrategy(
       throw new UnauthorizedException('리프레시 토큰이 없습니다.');
     }
 
-    const user = await this.usersService.findById(payload.sub);
+    const user = await this.userService.findById(payload.sub);
     if (!user) {
       throw new UnauthorizedException('존재하지 않는 사용자입니다.');
     }

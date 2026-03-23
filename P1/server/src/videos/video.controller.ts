@@ -10,7 +10,7 @@ import {
   HttpStatus,
   HttpCode,
 } from '@nestjs/common';
-import { VideosService } from './videos.service';
+import { VideoService } from './video.service';
 import { ApiResponseDto } from '@common/dto/api-response.dto';
 import { GetVideoDetailResponse } from './dto/get-video-detail.dto';
 import { ApiGetVideoDetail } from './decorators/video-swagger.decorator';
@@ -18,8 +18,8 @@ import { JwtAccessGuard } from '@auth/guards/jwt-access.guard';
 import { ApiBearerAuth } from '@nestjs/swagger';
 
 @Controller('videos')
-export class VideosController {
-  constructor(private readonly videosService: VideosService) {}
+export class VideoController {
+  constructor(private readonly videoService: VideoService) {}
 
   @Get('/:id')
   @UseGuards(JwtAccessGuard)
@@ -29,7 +29,7 @@ export class VideosController {
   async getVideoDetail(
     @Param('id') id: string,
   ): Promise<ApiResponseDto<GetVideoDetailResponse>> {
-    const data = await this.videosService.getVideoDetail(id);
+    const data = await this.videoService.getVideoDetail(id);
 
     return ApiResponseDto.success(
       data,

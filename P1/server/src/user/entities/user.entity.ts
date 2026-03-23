@@ -10,8 +10,9 @@ import {
 import { hash, compare } from 'bcrypt';
 import { UserRole } from '../../common/enums/user-role.enum';
 import { RefreshToken } from '@auth/entities/refresh-token.entity';
-import { Videos } from 'src/videos/entities/videos.entity';
-import { Courses } from 'src/courses/entities/courses.entity';
+import { Video } from 'src/videos/entities/video.entity';
+import { Course } from 'src/courses/entities/course.entity';
+import { Enrollment } from 'src/enrollments/entities/enrollment.entity';
 
 @Entity('users')
 export class User {
@@ -40,11 +41,14 @@ export class User {
   })
   refreshTokens: RefreshToken[];
 
-  @OneToMany(() => Videos, (video) => video.teacher)
-  videos: Videos[];
+  @OneToMany(() => Video, (video) => video.teacher)
+  videos: Video[];
 
-  @OneToMany(() => Courses, (course) => course.teacher)
-  courses: Courses[];
+  @OneToMany(() => Course, (course) => course.teacher)
+  courses: Course[];
+
+  @OneToMany(() => Enrollment, (enrollment) => enrollment.user)
+  enrollments: Enrollment[];
 
   @CreateDateColumn({ name: 'created_at' })
   createdAt: Date;

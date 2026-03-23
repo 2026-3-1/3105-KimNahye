@@ -1,20 +1,20 @@
 import { Inject, Injectable, NotFoundException } from '@nestjs/common';
 import {
-  IVideosRepository,
-  VIDEOS_REPOSITORY,
+  IVideoRepository,
+  VIDEO_REPOSITORY,
 } from './interfaces/video-repository.interface';
 import { GetVideoDetailResponse } from './dto/get-video-detail.dto';
-import { Videos } from './entities/videos.entity';
+import { Video } from './entities/video.entity';
 
 @Injectable()
-export class VideosService {
+export class VideoService {
   constructor(
-    @Inject(VIDEOS_REPOSITORY)
-    private readonly videosRepository: IVideosRepository,
+    @Inject(VIDEO_REPOSITORY)
+    private readonly videoRepository: IVideoRepository,
   ) {}
 
   async getVideoDetail(id: string): Promise<GetVideoDetailResponse> {
-    const video = (await this.videosRepository.findById(id)) as Videos;
+    const video = (await this.videoRepository.findById(id)) as Video;
 
     if (!video) {
       throw new NotFoundException('영상을 찾을 수 없습니다.');

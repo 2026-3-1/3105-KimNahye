@@ -6,7 +6,7 @@ import { AuthController } from './auth.controller';
 import { AuthService } from './services/auth.service';
 import { JwtAccessStrategy } from './strategies/jwt-access.strategy';
 import { JwtRefreshStrategy } from './strategies/jwt-refresh.strategy';
-import { UsersModule } from 'src/user/user.module';
+import { UserModule } from 'src/user/user.module';
 import { TokenService } from './services/token.service';
 import { RefreshTokenService } from './services/refresh-token.service';
 import { TypeOrmModule } from '@nestjs/typeorm';
@@ -16,7 +16,7 @@ import { RefreshTokenRepository } from './repositories/refresh-token.repository'
 
 @Module({
   imports: [
-    UsersModule,
+    UserModule,
     TypeOrmModule.forFeature([RefreshToken]),
     PassportModule.register({ defaultStrategy: 'jwt-access' }),
     // JwtModule은 비동기로 등록 — ConfigService에서 secret을 주입

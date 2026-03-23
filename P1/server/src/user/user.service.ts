@@ -1,30 +1,30 @@
 import { Inject, Injectable } from '@nestjs/common';
 import {
-  IUsersRepository,
-  USERS_REPOSITORY,
+  IUserRepository,
+  USER_REPOSITORY,
 } from './interfaces/user-repository.interface';
 import { User } from './entities/user.entity';
 
 @Injectable()
-export class UsersService {
+export class UserService {
   constructor(
-    @Inject(USERS_REPOSITORY)
-    private readonly usersRepository: IUsersRepository,
+    @Inject(USER_REPOSITORY)
+    private readonly userRepository: IUserRepository,
   ) {}
 
   async findByEmail(email: string): Promise<User | null> {
-    return this.usersRepository.findByEmail(email);
+    return this.userRepository.findByEmail(email);
   }
 
   async findByEmailWithPassword(email: string): Promise<User | null> {
-    return this.usersRepository.findByEmailWithPassword(email);
+    return this.userRepository.findByEmailWithPassword(email);
   }
 
   async findById(id: string): Promise<User | null> {
-    return this.usersRepository.findById(id);
+    return this.userRepository.findById(id);
   }
 
   async create(userData: Partial<User>): Promise<User> {
-    return this.usersRepository.create(userData);
+    return this.userRepository.create(userData);
   }
 }

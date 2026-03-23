@@ -1,30 +1,34 @@
 import { Inject, Injectable, NotFoundException } from '@nestjs/common';
 import {
-  COURSES_REPOSITORY,
-  ICoursesRepository,
+  COURSE_REPOSITORY,
+  ICourseRepository,
 } from './interfaces/courses-repository.interface';
 
 import { CourseQueryDto } from './dto/course-query.dto';
 import { CourseListResponse } from './dto/course-list-response.dto';
 import { CourseDetailResponse } from './dto/course-detail.response.dto';
-import { Courses } from './entities/courses.entity';
+import { Course } from './entities/course.entity';
 import { VideoItem } from './dto/video-item.dto';
-import { UsersService } from 'src/user/user.service';
+import { UserService } from 'src/user/user.service';
 
 @Injectable()
-export class CoursesService {
+export class CourseService {
   constructor(
-    @Inject(COURSES_REPOSITORY)
-    private readonly coursesRepository: ICoursesRepository,
-    private readonly usersService: UsersService,
+    @Inject(COURSE_REPOSITORY)
+    private readonly courseRepository: ICourseRepository,
+    private readonly userService: UserService,
   ) {}
+
+  async findById(id: string): Promise<Course | null> {
+    return this.courseRepository.findById(id);
+  }
 
   async getCourseList(
     dto: CourseQueryDto,
   ): Promise<CourseListResponse[] | null> {
     const { category, difficulty, requiredTools, duration, page, limit } = dto;
 
-    const courseList = await this.coursesRepository.findByQuery(
+    const courseList = await this.courseRepository.findByQuery(
       category,
       difficulty,
       requiredTools,
@@ -49,7 +53,7 @@ export class CoursesService {
   }
 
   async getCourseDetail(id: string): Promise<CourseDetailResponse> {
-    const course = (await this.coursesRepository.findById(id)) as Courses;
+    const course = (await this.courseRepository.findById(id)) as Course;
 
     if (!course) {
       throw new NotFoundException('강의를 찾을 수 없습니다.');
@@ -80,7 +84,7 @@ export class CoursesService {
   async getCourseListByUser(
     userId: string,
   ): Promise<CourseListResponse[] | null> {
-    const user = await this.usersService.findById(userId);
+    const user = await this.userService.findById(userId);
     if (!user) {
       throw new NotFoundException('유저가 존재하지 않습니다.');
     }

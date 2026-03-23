@@ -44,3 +44,12 @@ export const ApiGetCourseListByUser = () =>
       description: '유저 아이디 입력 후 강의 목록 조회',
     }),
   );
+
+export const ApiRegistration = () =>
+  applyDecorators(
+    ApiOperation({
+      summary: '강의 수강 신청',
+      description: 'id 입력 후 강의 수강 신청',
+    }),
+    ApiParam({ name: 'id', type: String, required: true }),
+  );

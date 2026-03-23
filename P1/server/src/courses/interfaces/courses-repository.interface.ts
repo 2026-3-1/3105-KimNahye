@@ -1,8 +1,8 @@
-import { Courses } from '../entities/courses.entity';
+import { Course } from '../entities/course.entity';
 import { Category } from '../entities/enums/category.enum';
 import { Difficulty } from '../entities/enums/difficulty.enum';
 
-export interface ICoursesRepository {
+export interface ICourseRepository {
   findByQuery(
     category?: Category,
     difficulty?: Difficulty,
@@ -10,9 +10,9 @@ export interface ICoursesRepository {
     duration?: number,
     page?: number,
     limit?: number,
-  ): Promise<Courses[] | null>;
+  ): Promise<Course[] | null>;
 
-  findById(id: string): Promise<Courses | null>;
+  findById(id: string): Promise<Course | null>;
 }
 
-export const COURSES_REPOSITORY = Symbol('ICoursesRepository');
+export const COURSE_REPOSITORY = Symbol('ICourseRepository');

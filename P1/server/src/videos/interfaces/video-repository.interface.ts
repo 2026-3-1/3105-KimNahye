@@ -1,5 +1,5 @@
-export interface IVideosRepository {
+export interface IVideoRepository {
   findById(id: string);
 }
 
-export const VIDEOS_REPOSITORY = Symbol('IVideosRepository');
+export const VIDEO_REPOSITORY = Symbol('IVideoRepository');
