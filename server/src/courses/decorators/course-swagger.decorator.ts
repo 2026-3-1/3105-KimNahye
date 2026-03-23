@@ -36,3 +36,11 @@ export const ApiGetCourseDetail = () =>
     }),
     ApiParam({ name: 'id', type: String, required: true }),
   );
+
+export const ApiGetCourseListByUser = () =>
+  applyDecorators(
+    ApiOperation({
+      summary: '내 강의 목록 조회',
+      description: '유저 아이디 입력 후 강의 목록 조회',
+    }),
+  );

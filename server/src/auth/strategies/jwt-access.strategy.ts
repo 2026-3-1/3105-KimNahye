@@ -23,6 +23,7 @@ export class JwtAccessStrategy extends PassportStrategy(
   }
 
   async validate(payload: JwtPayload): Promise<User> {
+    console.log('진입');
     if (payload.type !== 'access') {
       throw new UnauthorizedException('액세스 토큰이 아닙니다.');
     }

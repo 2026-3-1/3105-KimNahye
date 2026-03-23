@@ -47,6 +47,6 @@ import { RefreshTokenRepository } from './repositories/refresh-token.repository'
       useClass: RefreshTokenRepository,
     },
   ],
-  exports: [AuthService],
+  exports: [AuthService, JwtAccessStrategy, PassportModule],
 })
 export class AuthModule {}

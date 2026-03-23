@@ -9,12 +9,14 @@ import { CourseListResponse } from './dto/course-list-response.dto';
 import { CourseDetailResponse } from './dto/course-detail.response.dto';
 import { Courses } from './entities/courses.entity';
 import { VideoItem } from './dto/video-item.dto';
+import { UsersService } from 'src/user/user.service';
 
 @Injectable()
 export class CoursesService {
   constructor(
     @Inject(COURSES_REPOSITORY)
     private readonly coursesRepository: ICoursesRepository,
+    private readonly usersService: UsersService,
   ) {}
 
   async getCourseList(
@@ -73,5 +75,33 @@ export class CoursesService {
       createdAt: course.createdAt,
       updatedAt: course.updatedAt,
     };
+  }
+
+  async getCourseListByUser(
+    userId: string,
+  ): Promise<CourseListResponse[] | null> {
+    console.log('service 입장');
+    const user = await this.usersService.findById(userId);
+    console.log('여기까지 됨 1');
+    if (!user) {
+      throw new NotFoundException('유저가 존재하지 않습니다.');
+    }
+    console.log('여기까지 됨 2');
+    const courseList = user.courses;
+
+    if (!courseList) return null;
+    console.log('여기까지 됨 3');
+
+    return courseList.map((course) => ({
+      id: course.id,
+      teacher: {
+        id: course.teacher.id,
+        name: course.teacher.nickname,
+      },
+      videoCount: course.computedVideoCount ?? 0,
+      category: course.category,
+      difficulty: course.difficulty,
+      requiredTools: course.requiredTools,
+    }));
   }
 }

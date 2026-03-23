@@ -5,22 +5,29 @@ import {
   HttpStatus,
   Param,
   Query,
+  UseGuards,
 } from '@nestjs/common';
 import { CoursesService } from './courses.service';
 import {
   ApiGetCourseDetail,
   ApiGetCourseList,
+  ApiGetCourseListByUser,
 } from './decorators/course-swagger.decorator';
 import { CourseQueryDto } from './dto/course-query.dto';
 import { ApiResponseDto } from '@common/dto/api-response.dto';
 import { CourseListResponse } from './dto/course-list-response.dto';
 import { CourseDetailResponse } from './dto/course-detail.response.dto';
+import { GetUser } from '@common/decorators/get-user.decorator';
+import { JwtAccessGuard } from '@auth/guards/jwt-access.guard';
+import { ApiBearerAuth } from '@nestjs/swagger';
 
 @Controller('courses')
 export class CoursesController {
   constructor(private readonly coursesService: CoursesService) {}
 
   @Get('list')
+  @ApiBearerAuth('access-token')
+  @UseGuards(JwtAccessGuard)
   @HttpCode(HttpStatus.OK)
   @ApiGetCourseList()
   async getCourseList(
@@ -35,7 +42,25 @@ export class CoursesController {
     );
   }
 
+  @Get('/my')
+  @ApiBearerAuth('access-token')
+  @HttpCode(HttpStatus.OK)
+  @UseGuards(JwtAccessGuard)
+  @ApiGetCourseListByUser()
+  async getCourseListByUser(
+    @GetUser('id') userId: string,
+  ): Promise<ApiResponseDto<CourseListResponse[] | null>> {
+    const data = await this.coursesService.getCourseListByUser(userId);
+    return ApiResponseDto.success(
+      data,
+      '내 강의 목록 조회에 성공하였습니다.',
+      HttpStatus.OK,
+    );
+  }
+
   @Get('/:id')
+  @ApiBearerAuth('access-token')
+  @UseGuards(JwtAccessGuard)
   @HttpCode(HttpStatus.OK)
   @ApiGetCourseDetail()
   async getCourseDetail(
