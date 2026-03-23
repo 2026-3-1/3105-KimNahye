@@ -11,10 +11,11 @@ import {
   HttpCode,
 } from '@nestjs/common';
 import { VideosService } from './videos.service';
-import { JwtAccessGuard } from '@auth/guards/jwt-access.guard';
 import { ApiResponseDto } from '@common/dto/api-response.dto';
 import { GetVideoDetailResponse } from './dto/get-video-detail.dto';
 import { ApiGetVideoDetail } from './decorators/video-swagger.decorator';
+import { JwtAccessGuard } from '@auth/guards/jwt-access.guard';
+import { ApiBearerAuth } from '@nestjs/swagger';
 
 @Controller('videos')
 export class VideosController {
@@ -22,6 +23,7 @@ export class VideosController {
 
   @Get('/:id')
   @UseGuards(JwtAccessGuard)
+  @ApiBearerAuth('access-token')
   @ApiGetVideoDetail()
   @HttpCode(HttpStatus.OK)
   async getVideoDetail(

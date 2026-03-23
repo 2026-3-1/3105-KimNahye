@@ -1,4 +1,4 @@
-export class IVideosRepository {
+export interface IVideosRepository {
   findById(id: string);
 }
 
