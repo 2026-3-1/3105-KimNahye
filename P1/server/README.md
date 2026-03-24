@@ -1,3 +1,10 @@
+## 시작하기
+
+1. `.env.example`을 복사하여 `.env` 파일 생성
+   cp .env.example .env
+
+2. `.env` 파일의 각 항목을 환경에 맞게 입력
+
 ## Project setup
 
 ```bash
