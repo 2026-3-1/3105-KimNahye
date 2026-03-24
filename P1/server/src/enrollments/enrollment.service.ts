@@ -12,6 +12,8 @@ import {
   ENROLLMENT_REPOSITORY,
   IEnrollmentRepository,
 } from './interfaces/enrollment-repository.interface';
+import { User } from 'src/user/entities/user.entity';
+import { Course } from 'src/courses/entities/course.entity';
 
 @Injectable()
 export class EnrollmentService {
@@ -21,6 +23,16 @@ export class EnrollmentService {
     private readonly userService: UserService,
     private readonly courseService: CourseService,
   ) {}
+
+  async findByUserAndCourse(
+    user: User,
+    course: Course,
+  ): Promise<Enrollment | null> {
+    return (await this.enrollmentRepository.findByUserAndCourse(
+      user,
+      course,
+    )) as Enrollment;
+  }
 
   async enroll(userId: string, courseId: string): Promise<Enrollment> {
     const user = await this.userService.findById(userId);

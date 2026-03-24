@@ -26,5 +26,6 @@ import { CourseModule } from 'src/courses/course.module';
       useClass: EnrollmentRepository,
     },
   ],
+  exports: [EnrollmentService],
 })
 export class EnrollmentsModule {}

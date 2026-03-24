@@ -9,12 +9,18 @@ import { VideoRepository } from './video.repository';
 import { VIDEO_REPOSITORY } from './interfaces/video-repository.interface';
 import { AuthModule } from '@auth/auth.module';
 import { PassportModule } from '@nestjs/passport';
+import { UserModule } from 'src/user/user.module';
+import { CourseModule } from 'src/courses/course.module';
+import { EnrollmentsModule } from 'src/enrollments/enrollment.module';
 
 @Module({
   imports: [
     TypeOrmModule.forFeature([Video, User, Course]),
+    UserModule,
+    CourseModule,
     AuthModule,
     PassportModule,
+    EnrollmentsModule,
   ],
   controllers: [VideoController],
   providers: [

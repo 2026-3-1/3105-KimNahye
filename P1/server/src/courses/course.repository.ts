@@ -5,6 +5,7 @@ import { Repository } from 'typeorm';
 import { ICourseRepository } from './interfaces/courses-repository.interface';
 import { Category } from './entities/enums/category.enum';
 import { Difficulty } from './entities/enums/difficulty.enum';
+import { Video } from 'src/videos/entities/video.entity';
 
 @Injectable()
 export class CourseRepository implements ICourseRepository {
@@ -12,6 +13,20 @@ export class CourseRepository implements ICourseRepository {
     @InjectRepository(Course)
     private readonly repo: Repository<Course>,
   ) {}
+
+  async findByVideo(video: Video): Promise<Course | null> {
+    const result = await this.repo.findOne({
+      where: {
+        videos: { id: video.id },
+      },
+      relations: {
+        videos: true,
+        teacher: true,
+      },
+    });
+
+    return result;
+  }
 
   async findByQuery(
     category?: Category,

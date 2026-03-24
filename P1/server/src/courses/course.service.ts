@@ -10,6 +10,7 @@ import { CourseDetailResponse } from './dto/course-detail.response.dto';
 import { Course } from './entities/course.entity';
 import { VideoItem } from './dto/video-item.dto';
 import { UserService } from 'src/user/user.service';
+import { Video } from 'src/videos/entities/video.entity';
 
 @Injectable()
 export class CourseService {
@@ -21,6 +22,10 @@ export class CourseService {
 
   async findById(id: string): Promise<Course | null> {
     return this.courseRepository.findById(id);
+  }
+
+  async findByVideo(video: Video): Promise<Course | null> {
+    return this.courseRepository.findByVideo(video);
   }
 
   async getCourseList(
