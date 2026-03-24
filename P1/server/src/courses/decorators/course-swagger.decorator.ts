@@ -1,5 +1,6 @@
 import { applyDecorators } from '@nestjs/common';
 import {
+  ApiBody,
   ApiOkResponse,
   ApiOperation,
   ApiParam,
@@ -45,11 +46,32 @@ export const ApiGetCourseListByUser = () =>
     }),
   );
 
-export const ApiRegistration = () =>
+export const ApiCreateCourse = () =>
   applyDecorators(
     ApiOperation({
-      summary: '강의 수강 신청',
-      description: 'id 입력 후 강의 수강 신청',
+      summary: '강의 생성',
+      description: '선생님만 접근 가능',
     }),
-    ApiParam({ name: 'id', type: String, required: true }),
+    ApiBody({
+      schema: {
+        type: 'object',
+        required: ['category', 'difficulty', 'requiredTools'],
+        properties: {
+          category: {
+            type: 'string',
+            example:
+              'KOREAN, JAPANESE,CHINESE,WESTERN,BAKING,SIDE_DISH,ONE_DISH',
+          },
+          difficulty: {
+            type: 'string',
+            example: 'HIGH, MEDIUM, LOW',
+          },
+          requiredTools: {
+            type: 'array',
+            items: { type: 'string' },
+            example: ['칼', '도마'],
+          },
+        },
+      },
+    }),
   );

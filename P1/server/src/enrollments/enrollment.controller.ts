@@ -16,6 +16,7 @@ import { ApiBearerAuth } from '@nestjs/swagger';
 import { GetUser } from '@common/decorators/get-user.decorator';
 import { Enrollment } from './entities/enrollment.entity';
 import { ApiResponseDto } from '@common/dto/api-response.dto';
+import { ApiEnroll } from './decorators/enrollment-swagger.decorator';
 
 @Controller('enrollments')
 export class EnrollmentController {
@@ -25,6 +26,7 @@ export class EnrollmentController {
   @UseGuards(JwtAccessGuard)
   @ApiBearerAuth('access-token')
   @HttpCode(HttpStatus.CREATED)
+  @ApiEnroll()
   async enroll(
     @Param('courseId') courseId: string,
     @GetUser('id') userId: string,

@@ -1,4 +1,5 @@
 import {
+  Body,
   Controller,
   Get,
   HttpCode,
@@ -10,10 +11,10 @@ import {
 } from '@nestjs/common';
 import { CourseService } from './course.service';
 import {
+  ApiCreateCourse,
   ApiGetCourseDetail,
   ApiGetCourseList,
   ApiGetCourseListByUser,
-  ApiRegistration,
 } from './decorators/course-swagger.decorator';
 import { CourseQueryDto } from './dto/course-query.dto';
 import { ApiResponseDto } from '@common/dto/api-response.dto';
@@ -22,10 +23,29 @@ import { CourseDetailResponse } from './dto/course-detail.response.dto';
 import { GetUser } from '@common/decorators/get-user.decorator';
 import { JwtAccessGuard } from '@auth/guards/jwt-access.guard';
 import { ApiBearerAuth } from '@nestjs/swagger';
+import { CreateCourseRequest } from './dto/create-course-request.dto';
 
 @Controller('courses')
 export class CourseController {
   constructor(private readonly courseService: CourseService) {}
+
+  @Post()
+  @ApiBearerAuth('access-token')
+  @UseGuards(JwtAccessGuard)
+  @HttpCode(HttpStatus.CREATED)
+  @ApiCreateCourse()
+  async createCourse(
+    @Body() dto: CreateCourseRequest,
+    @GetUser('id') userId: string,
+  ): Promise<ApiResponseDto<void>> {
+    const result = await this.courseService.create(dto, userId);
+
+    return ApiResponseDto.success(
+      null,
+      '강의 생성에 성공하였습니다.',
+      HttpStatus.CREATED,
+    );
+  }
 
   @Get('list')
   @ApiBearerAuth('access-token')

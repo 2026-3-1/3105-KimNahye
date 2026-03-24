@@ -1,4 +1,10 @@
-import { Inject, Injectable, NotFoundException } from '@nestjs/common';
+import {
+  ForbiddenException,
+  Inject,
+  Injectable,
+  InternalServerErrorException,
+  NotFoundException,
+} from '@nestjs/common';
 import {
   COURSE_REPOSITORY,
   ICourseRepository,
@@ -11,6 +17,8 @@ import { Course } from './entities/course.entity';
 import { VideoItem } from './dto/video-item.dto';
 import { UserService } from 'src/user/user.service';
 import { Video } from 'src/videos/entities/video.entity';
+import { CreateCourseRequest } from './dto/create-course-request.dto';
+import { UserRole } from '@common/enums/user-role.enum';
 
 @Injectable()
 export class CourseService {
@@ -26,6 +34,31 @@ export class CourseService {
 
   async findByVideo(video: Video): Promise<Course | null> {
     return this.courseRepository.findByVideo(video);
+  }
+
+  async create(dto: CreateCourseRequest, userId: string): Promise<void> {
+    const user = await this.userService.findById(userId);
+
+    if (!user) {
+      throw new NotFoundException('존재하지 않는 사용자입니다.');
+    }
+
+    if (user.role !== UserRole.TEACHER) {
+      throw new ForbiddenException('수강 등록은 선생님만 할 수 있습니다.');
+    }
+
+    const newCourse = await this.courseRepository.create(
+      user,
+      dto.category,
+      dto.difficulty,
+      dto.requiredTools,
+    );
+
+    if (!newCourse) {
+      throw new InternalServerErrorException(
+        '서버 오류: 강의 등록에 실패하였습니다.',
+      );
+    }
   }
 
   async getCourseList(
