@@ -13,6 +13,9 @@ import { Video } from './entities/video.entity';
 import { CourseService } from 'src/courses/course.service';
 import { UserService } from 'src/user/user.service';
 import { EnrollmentService } from 'src/enrollments/enrollment.service';
+import { CreateVideoDto } from './dto/create-video.dto';
+import { UserRole } from '@common/enums/user-role.enum';
+import { CreateVideoReponseDto } from './dto/create-video-response.dto';
 
 @Injectable()
 export class VideoService {
@@ -59,6 +62,54 @@ export class VideoService {
       youtubeVideoId: video.youtubeVideoId,
       title: video.title,
       duration: video.duration,
+    };
+  }
+
+  async create(
+    createVideoDto: CreateVideoDto,
+    userId: string,
+  ): Promise<CreateVideoReponseDto> {
+    const teacher = await this.userService.findById(userId);
+
+    if (!teacher) {
+      throw new NotFoundException('존재하지 않는 유저입니다.');
+    }
+
+    // 1. teacher 역할 검증
+    if (teacher.role !== UserRole.TEACHER) {
+      throw new ForbiddenException('강사만 영상을 등록할 수 있습니다.');
+    }
+
+    // 2. 코스 존재 여부 확인
+    const course = await this.courseService.findById(createVideoDto.courseId);
+    if (!course) {
+      throw new NotFoundException(
+        `ID ${createVideoDto.courseId}에 해당하는 코스를 찾을 수 없습니다.`,
+      );
+    }
+
+    // 3. 코스 소유자 검증 (본인 코스에만 영상 등록 가능)
+    if (course.teacher.id !== teacher.id) {
+      throw new ForbiddenException(
+        '본인의 코스에만 영상을 등록할 수 있습니다.',
+      );
+    }
+
+    // 4. 영상 생성 및 저장
+    const video = this.videoRepository.create(
+      createVideoDto.youtubeVideoId,
+      createVideoDto.title,
+      createVideoDto.duration,
+      teacher,
+      course,
+    ) as Video;
+
+    return {
+      id: video.id,
+      youtubeVideoId: video.youtubeVideoId,
+      title: video.title,
+      duration: video.duration,
+      created_at: video.createdAt,
     };
   }
 }

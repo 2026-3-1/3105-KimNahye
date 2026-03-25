@@ -10,6 +10,9 @@ export class UserRepository implements IUserRepository {
     @InjectRepository(User)
     private readonly repo: Repository<User>,
   ) {}
+  async save(user: User) {
+    await this.repo.save(user);
+  }
 
   async findByEmail(email: string): Promise<User | null> {
     return this.repo.findOne({ where: { email } });

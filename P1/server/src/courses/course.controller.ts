@@ -26,12 +26,12 @@ import { ApiBearerAuth } from '@nestjs/swagger';
 import { CreateCourseRequest } from './dto/create-course-request.dto';
 
 @Controller('courses')
+@ApiBearerAuth('access-token')
+@UseGuards(JwtAccessGuard)
 export class CourseController {
   constructor(private readonly courseService: CourseService) {}
 
   @Post()
-  @ApiBearerAuth('access-token')
-  @UseGuards(JwtAccessGuard)
   @HttpCode(HttpStatus.CREATED)
   @ApiCreateCourse()
   async createCourse(
@@ -48,8 +48,6 @@ export class CourseController {
   }
 
   @Get('list')
-  @ApiBearerAuth('access-token')
-  @UseGuards(JwtAccessGuard)
   @HttpCode(HttpStatus.OK)
   @ApiGetCourseList()
   async getCourseList(
@@ -65,9 +63,7 @@ export class CourseController {
   }
 
   @Get('/my')
-  @ApiBearerAuth('access-token')
   @HttpCode(HttpStatus.OK)
-  @UseGuards(JwtAccessGuard)
   @ApiGetCourseListByUser()
   async getCourseListByUser(
     @GetUser('id') userId: string,
@@ -81,8 +77,6 @@ export class CourseController {
   }
 
   @Get('/:id')
-  @ApiBearerAuth('access-token')
-  @UseGuards(JwtAccessGuard)
   @HttpCode(HttpStatus.OK)
   @ApiGetCourseDetail()
   async getCourseDetail(
