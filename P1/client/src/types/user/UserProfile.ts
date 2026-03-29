@@ -3,7 +3,5 @@ export type UserProfile = {
   email: string
   nickname: string
   role: "teacher" | "student"
-  owned_tools: string[]
-  level: number
-  created_at: string // ISO8601
+  createdAt: string
 }
