@@ -5,6 +5,7 @@ import useAuthStore from "../store/AuthStore"
 import styles from "./Auth.module.css"
 import type { AxiosError } from "axios"
 import apiClient from "../api/ApiClient"
+import { getMyInfo } from "../api/UserApi"
 
 type LoginForm = {
   email: string
@@ -15,7 +16,7 @@ export default function Login() {
   const [form, setForm] = useState<LoginForm>({ email: "", password: "" })
   const [error, setError] = useState<string>("")
   const [loading, setLoading] = useState<boolean>(false)
-  const { setAuth } = useAuthStore()
+  const { setAuth, setUser } = useAuthStore()
   const navigate = useNavigate()
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -29,6 +30,11 @@ export default function Login() {
       setAuth(null, accessToken, refreshToken)
       apiClient.defaults.headers.common["Authorization"] =
         `Bearer ${accessToken}`
+
+      const { data: meData } = await getMyInfo()
+      const userProfile = (meData as any)?.data ?? meData
+      setUser(userProfile)
+
       navigate("/")
     } catch (err) {
       const axiosError = err as AxiosError<{ message: string }>

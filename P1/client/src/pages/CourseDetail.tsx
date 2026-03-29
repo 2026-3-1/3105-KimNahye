@@ -185,7 +185,10 @@ export default function CourseDetailPage() {
                   <button
                     key={video.id}
                     className={`${styles.videoItem} ${activeVideo === idx ? styles.videoItemActive : ""}`}
-                    onClick={() => setActiveVideo(idx)}
+                    onClick={() => {
+                      setActiveVideo(idx)
+                      navigate(`/videos/${video.id}`)
+                    }}
                   >
                     <span className={styles.videoIndex}>{idx + 1}</span>
                     <span className={styles.videoTitle}>{video.title}</span>
