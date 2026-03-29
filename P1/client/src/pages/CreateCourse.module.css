@@ -1,0 +1,451 @@
+.page {
+  min-height: 100vh;
+  background: var(--bg);
+}
+
+.inner {
+  max-width: 680px;
+  margin: 0 auto;
+  padding: 40px 24px 80px;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+/* ── 헤더 ─────────────────────────────────────────────────── */
+.header {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.title {
+  font-size: 28px;
+  font-weight: 900;
+  letter-spacing: -1px;
+  color: var(--text-primary);
+}
+
+.desc {
+  font-size: 15px;
+  color: var(--text-muted);
+}
+
+/* ── 스텝 인디케이터 ──────────────────────────────────────── */
+.steps {
+  display: flex;
+  align-items: center;
+  gap: 0;
+  padding: 20px 24px;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+}
+
+.step {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  opacity: 0.4;
+  transition: opacity var(--transition);
+}
+.stepActive {
+  opacity: 1;
+}
+
+.stepNum {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: var(--border);
+  color: var(--text-muted);
+  font-size: 13px;
+  font-weight: 800;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all var(--transition);
+}
+.stepActive .stepNum {
+  background: var(--primary);
+  color: #fff;
+}
+
+.stepLabel {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-secondary);
+}
+.stepActive .stepLabel {
+  color: var(--text-primary);
+}
+
+.stepLine {
+  flex: 1;
+  height: 2px;
+  background: var(--border);
+  margin: 0 16px;
+  transition: background var(--transition);
+}
+.stepLineDone {
+  background: var(--primary);
+}
+
+/* ── 카드 ─────────────────────────────────────────────────── */
+.card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 28px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  transition: opacity var(--transition);
+}
+
+.cardDisabled {
+  opacity: 0.45;
+  pointer-events: none;
+}
+
+.cardTitle {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 17px;
+  font-weight: 800;
+  color: var(--text-primary);
+}
+
+.cardTitleNum {
+  font-size: 11px;
+  font-weight: 800;
+  color: var(--primary);
+  background: var(--primary-pale);
+  padding: 3px 8px;
+  border-radius: 6px;
+  letter-spacing: 0.5px;
+}
+
+/* ── 필드 ─────────────────────────────────────────────────── */
+.fieldGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.fieldLabel {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text-secondary);
+}
+
+.required {
+  color: #e74c3c;
+}
+
+.input {
+  padding: 11px 14px;
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius-sm);
+  font-size: 14px;
+  font-family: inherit;
+  background: var(--bg);
+  color: var(--text-primary);
+  outline: none;
+  transition: border-color var(--transition);
+  flex: 1;
+}
+.input:focus {
+  border-color: var(--primary);
+}
+.input::placeholder {
+  color: var(--text-muted);
+}
+.input:disabled {
+  opacity: 0.5;
+}
+
+.hint {
+  font-size: 12px;
+  color: var(--text-muted);
+}
+.hint code {
+  background: var(--surface);
+  padding: 1px 6px;
+  border-radius: 4px;
+  font-family: monospace;
+  font-size: 12px;
+}
+
+/* ── 영상 등록 행 ─────────────────────────────────────────── */
+.videoInputRow {
+  display: flex;
+  gap: 10px;
+}
+
+.registerBtn {
+  padding: 11px 20px;
+  background: var(--primary);
+  color: #fff;
+  border: none;
+  border-radius: var(--radius-sm);
+  font-size: 14px;
+  font-weight: 700;
+  font-family: inherit;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background var(--transition);
+}
+.registerBtn:hover:not(:disabled) {
+  background: var(--primary-dark);
+}
+.registerBtn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* ── 영상 미리보기 ────────────────────────────────────────── */
+.videoPreview {
+  display: flex;
+  gap: 16px;
+  align-items: center;
+  background: var(--surface);
+  border-radius: var(--radius-md);
+  padding: 14px;
+}
+
+.videoThumb {
+  width: 120px;
+  height: 68px;
+  object-fit: cover;
+  border-radius: var(--radius-sm);
+  flex-shrink: 0;
+}
+
+.videoPreviewInfo {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  flex: 1;
+}
+
+.videoPreviewTitle {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--text-primary);
+  line-height: 1.4;
+}
+
+.videoPreviewId {
+  font-size: 12px;
+  color: var(--text-muted);
+}
+
+.resetVideoBtn {
+  background: none;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 4px 12px;
+  font-size: 12px;
+  font-family: inherit;
+  color: var(--text-secondary);
+  cursor: pointer;
+  width: fit-content;
+  transition: all var(--transition);
+}
+.resetVideoBtn:hover {
+  border-color: var(--primary);
+  color: var(--primary);
+}
+
+/* ── 카테고리 그리드 ──────────────────────────────────────── */
+.optionGrid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 8px;
+}
+
+.optionBtn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  padding: 14px 8px;
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--bg);
+  font-size: 13px;
+  font-weight: 600;
+  font-family: inherit;
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: all var(--transition);
+}
+.optionBtn:hover {
+  border-color: var(--primary-light);
+  color: var(--primary);
+}
+.optionBtnActive {
+  border-color: var(--primary);
+  background: var(--primary-pale);
+  color: var(--primary-dark);
+}
+.optionBtn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.optionEmoji {
+  font-size: 22px;
+}
+
+/* ── 난이도 ───────────────────────────────────────────────── */
+.difficultyRow {
+  display: flex;
+  gap: 10px;
+}
+
+.diffBtn {
+  flex: 1;
+  padding: 12px;
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--bg);
+  font-size: 14px;
+  font-weight: 700;
+  font-family: inherit;
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: all var(--transition);
+}
+.diffBtn:hover {
+  border-color: var(--primary-light);
+}
+.diffBtn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* ── 도구 ─────────────────────────────────────────────────── */
+.toolChips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.chip {
+  padding: 6px 14px;
+  border: 1.5px solid var(--border);
+  border-radius: 20px;
+  background: var(--bg);
+  font-size: 12px;
+  font-weight: 600;
+  font-family: inherit;
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: all var(--transition);
+}
+.chip:hover {
+  border-color: var(--primary-light);
+  color: var(--primary);
+}
+.chipActive {
+  border-color: var(--primary);
+  background: var(--primary-pale);
+  color: var(--primary-dark);
+}
+.chip:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.customToolRow {
+  display: flex;
+  gap: 10px;
+}
+
+.addToolBtn {
+  padding: 11px 18px;
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--bg);
+  font-size: 14px;
+  font-weight: 700;
+  font-family: inherit;
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: all var(--transition);
+  white-space: nowrap;
+}
+.addToolBtn:hover:not(:disabled) {
+  border-color: var(--primary);
+  color: var(--primary);
+}
+.addToolBtn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.selectedTools {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.selectedTool {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: var(--primary-pale);
+  border: 1px solid var(--primary-light);
+  border-radius: 20px;
+  padding: 4px 12px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--primary-dark);
+}
+
+.removeToolBtn {
+  background: none;
+  border: none;
+  font-size: 14px;
+  line-height: 1;
+  color: var(--primary);
+  cursor: pointer;
+  padding: 0;
+  display: flex;
+  align-items: center;
+}
+
+/* ── 에러 / 제출 ──────────────────────────────────────────── */
+.errorMsg {
+  padding: 10px 14px;
+  background: #fff0f0;
+  border: 1px solid #fdd;
+  border-radius: var(--radius-sm);
+  font-size: 13px;
+  color: #c0392b;
+}
+
+.submitBtn {
+  width: 100%;
+  padding: 15px;
+  background: var(--primary);
+  color: #fff;
+  border: none;
+  border-radius: var(--radius-sm);
+  font-size: 16px;
+  font-weight: 800;
+  font-family: inherit;
+  cursor: pointer;
+  transition: background var(--transition);
+  margin-top: 4px;
+}
+.submitBtn:hover:not(:disabled) {
+  background: var(--primary-dark);
+}
+.submitBtn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
