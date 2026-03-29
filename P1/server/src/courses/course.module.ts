@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { forwardRef, Module } from '@nestjs/common';
 import { CourseService } from './course.service';
 import { CourseController } from './course.controller';
 import { TypeOrmModule } from '@nestjs/typeorm';
@@ -8,6 +8,8 @@ import { CourseRepository } from './course.repository';
 import { UserModule } from 'src/user/user.module';
 import { PassportModule } from '@nestjs/passport';
 import { AuthModule } from '@auth/auth.module';
+import { EnrollmentService } from 'src/enrollments/enrollment.service';
+import { EnrollmentsModule } from 'src/enrollments/enrollment.module';
 
 @Module({
   imports: [
@@ -15,9 +17,11 @@ import { AuthModule } from '@auth/auth.module';
     UserModule,
     PassportModule,
     AuthModule,
+    forwardRef(() => EnrollmentsModule),
   ],
   providers: [
     CourseService,
+    EnrollmentService,
     {
       provide: COURSE_REPOSITORY,
       useClass: CourseRepository,

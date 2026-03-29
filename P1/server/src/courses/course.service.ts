@@ -1,5 +1,6 @@
 import {
   ForbiddenException,
+  forwardRef,
   Inject,
   Injectable,
   InternalServerErrorException,
@@ -19,6 +20,7 @@ import { UserService } from 'src/user/user.service';
 import { Video } from 'src/videos/entities/video.entity';
 import { CreateCourseRequest } from './dto/create-course-request.dto';
 import { UserRole } from '@common/enums/user-role.enum';
+import { EnrollmentService } from 'src/enrollments/enrollment.service';
 
 @Injectable()
 export class CourseService {
@@ -26,6 +28,8 @@ export class CourseService {
     @Inject(COURSE_REPOSITORY)
     private readonly courseRepository: ICourseRepository,
     private readonly userService: UserService,
+    @Inject(forwardRef(() => EnrollmentService))
+    private readonly enrollmentService: EnrollmentService,
   ) {}
 
   async findById(id: string): Promise<Course | null> {
@@ -126,20 +130,24 @@ export class CourseService {
     if (!user) {
       throw new NotFoundException('유저가 존재하지 않습니다.');
     }
-    const courseList = user.courses;
 
-    if (!courseList) return null;
+    const enrollments = await this.enrollmentService.findAllByUser(user);
 
-    return courseList.map((course) => ({
-      id: course.id,
-      teacher: {
-        id: course.teacher.id,
-        name: course.teacher.nickname,
-      },
-      videoCount: course.computedVideoCount ?? 0,
-      category: course.category,
-      difficulty: course.difficulty,
-      requiredTools: course.requiredTools,
-    }));
+    if (!enrollments || enrollments.length === 0) return null;
+
+    return enrollments.map((enrollment) => {
+      const course = enrollment.course;
+      return {
+        id: course.id,
+        teacher: {
+          id: course.teacher.id,
+          name: course.teacher.nickname,
+        },
+        videoCount: course.computedVideoCount ?? 0,
+        category: course.category,
+        difficulty: course.difficulty,
+        requiredTools: course.requiredTools,
+      };
+    });
   }
 }

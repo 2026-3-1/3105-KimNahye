@@ -1,0 +1,435 @@
+.page {
+  min-height: 100vh;
+  background: var(--bg);
+}
+
+.inner {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 36px 24px 80px;
+}
+
+/* ── 브레드크럼 ───────────────────────────────────────────── */
+.breadcrumb {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 28px;
+  font-size: 13px;
+}
+
+.breadcrumbLink {
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  font-size: 13px;
+  font-family: inherit;
+  cursor: pointer;
+  transition: color var(--transition);
+}
+.breadcrumbLink:hover {
+  color: var(--primary);
+}
+
+.breadcrumbSep {
+  color: var(--text-muted);
+}
+
+.breadcrumbCurrent {
+  color: var(--text-secondary);
+  font-weight: 600;
+}
+
+/* ── 2컬럼 레이아웃 ───────────────────────────────────────── */
+.layout {
+  display: grid;
+  grid-template-columns: 1fr 300px;
+  gap: 32px;
+  align-items: start;
+}
+
+/* ── 히어로 ───────────────────────────────────────────────── */
+.hero {
+  display: flex;
+  gap: 24px;
+  align-items: center;
+  background: linear-gradient(135deg, var(--primary-pale) 0%, #fff8e1 100%);
+  border-radius: var(--radius-lg);
+  padding: 32px;
+  margin-bottom: 32px;
+  border: 1px solid #ffe0a0;
+}
+
+.heroEmoji {
+  font-size: 72px;
+  flex-shrink: 0;
+}
+
+.heroInfo {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.heroTags {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.categoryTag {
+  background: var(--primary);
+  color: #fff;
+  font-size: 12px;
+  font-weight: 700;
+  padding: 4px 12px;
+  border-radius: 20px;
+}
+
+.difficultyTag {
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.heroTitle {
+  font-size: 24px;
+  font-weight: 900;
+  letter-spacing: -0.5px;
+  color: var(--text-primary);
+  line-height: 1.3;
+}
+
+.heroMeta {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  font-size: 13px;
+  color: var(--text-secondary);
+  flex-wrap: wrap;
+}
+
+/* ── 섹션 공통 ────────────────────────────────────────────── */
+.section {
+  margin-bottom: 32px;
+}
+
+.sectionTitle {
+  font-size: 17px;
+  font-weight: 800;
+  color: var(--text-primary);
+  margin-bottom: 14px;
+  padding-bottom: 10px;
+  border-bottom: 2px solid var(--border);
+}
+
+/* ── 도구 ─────────────────────────────────────────────────── */
+.toolList {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.toolChip {
+  background: var(--bg-card);
+  border: 1.5px solid var(--border);
+  border-radius: 20px;
+  padding: 6px 16px;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text-secondary);
+}
+
+/* ── 커리큘럼 ─────────────────────────────────────────────── */
+.videoList {
+  display: flex;
+  flex-direction: column;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+}
+
+.videoItem {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 14px 18px;
+  background: var(--bg-card);
+  border: none;
+  border-bottom: 1px solid var(--border);
+  font-family: inherit;
+  cursor: pointer;
+  text-align: left;
+  transition: background var(--transition);
+}
+.videoItem:last-child {
+  border-bottom: none;
+}
+.videoItem:hover {
+  background: var(--primary-pale);
+}
+
+.videoItemActive {
+  background: var(--primary-pale);
+  border-left: 3px solid var(--primary);
+}
+
+.videoIndex {
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  background: var(--surface);
+  color: var(--text-muted);
+  font-size: 12px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+.videoItemActive .videoIndex {
+  background: var(--primary);
+  color: #fff;
+}
+
+.videoTitle {
+  flex: 1;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text-primary);
+}
+
+.videoDuration {
+  font-size: 12px;
+  color: var(--text-muted);
+  flex-shrink: 0;
+}
+
+/* ── 수강 신청 사이드바 ───────────────────────────────────── */
+.sidebar {
+  position: sticky;
+  top: 80px;
+}
+
+.enrollCard {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  box-shadow: var(--shadow-md);
+}
+
+.enrollCardTop {
+  padding: 28px 24px 20px;
+  background: linear-gradient(135deg, var(--primary-pale), #fff);
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+}
+
+.enrollEmoji {
+  font-size: 52px;
+}
+
+.enrollStats {
+  width: 100%;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+}
+
+.enrollStat {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding: 10px 6px;
+  background: var(--bg-card);
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border);
+}
+
+.enrollStatLabel {
+  font-size: 10px;
+  color: var(--text-muted);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+}
+
+.enrollStatValue {
+  font-size: 13px;
+  font-weight: 800;
+  color: var(--text-primary);
+}
+
+.enrollBtn {
+  display: block;
+  width: calc(100% - 48px);
+  margin: 20px 24px;
+  padding: 14px;
+  background: var(--primary);
+  color: #fff;
+  border: none;
+  border-radius: var(--radius-sm);
+  font-size: 15px;
+  font-weight: 700;
+  font-family: inherit;
+  cursor: pointer;
+  transition: background var(--transition);
+}
+.enrollBtn:hover:not(:disabled) {
+  background: var(--primary-dark);
+}
+.enrollBtn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.enrollDone {
+  margin: 20px 24px;
+  padding: 14px;
+  background: #f0fff4;
+  border: 1.5px solid #6fcf97;
+  border-radius: var(--radius-sm);
+  text-align: center;
+  font-size: 14px;
+  font-weight: 700;
+  color: #219653;
+}
+
+.teacherNote {
+  margin: 20px 24px;
+  padding: 12px;
+  background: var(--surface);
+  border-radius: var(--radius-sm);
+  text-align: center;
+  font-size: 13px;
+  color: var(--text-muted);
+}
+
+.enrollError {
+  margin: 0 24px;
+  padding: 10px 14px;
+  background: #fff0f0;
+  border: 1px solid #fdd;
+  border-radius: var(--radius-sm);
+  font-size: 13px;
+  color: #c0392b;
+}
+
+.teacherInfo {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 16px 24px 20px;
+  border-top: 1px solid var(--border);
+}
+
+.teacherAvatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: var(--primary);
+  color: #fff;
+  font-size: 16px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.teacherLabel {
+  font-size: 11px;
+  color: var(--text-muted);
+  margin-bottom: 2px;
+}
+.teacherName {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+/* ── 스켈레톤 ─────────────────────────────────────────────── */
+@keyframes shimmer {
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
+}
+.skeletonHero {
+  height: 200px;
+  border-radius: var(--radius-lg);
+  background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.4s infinite;
+  margin-bottom: 24px;
+}
+.skeletonBody {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.skeletonLine {
+  height: 20px;
+  border-radius: 6px;
+  background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.4s infinite;
+}
+.skeletonLine:nth-child(2) {
+  width: 75%;
+}
+.skeletonLine:nth-child(3) {
+  width: 55%;
+}
+
+/* ── 에러 ─────────────────────────────────────────────────── */
+.errorBox {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+  padding: 80px 0;
+  color: var(--text-muted);
+  font-size: 15px;
+}
+.errorBox span {
+  font-size: 48px;
+}
+.backBtn {
+  padding: 10px 24px;
+  border: 1.5px solid var(--primary);
+  border-radius: var(--radius-sm);
+  background: transparent;
+  color: var(--primary);
+  font-size: 14px;
+  font-weight: 600;
+  font-family: inherit;
+  cursor: pointer;
+  transition: all var(--transition);
+}
+.backBtn:hover {
+  background: var(--primary-pale);
+}
+
+/* ── 반응형 ───────────────────────────────────────────────── */
+@media (max-width: 860px) {
+  .layout {
+    grid-template-columns: 1fr;
+  }
+  .sidebar {
+    position: static;
+  }
+  .hero {
+    flex-direction: column;
+    text-align: center;
+  }
+  .heroMeta {
+    justify-content: center;
+  }
+}

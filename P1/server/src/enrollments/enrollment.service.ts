@@ -1,5 +1,6 @@
 import {
   ConflictException,
+  forwardRef,
   Inject,
   Injectable,
   InternalServerErrorException,
@@ -21,6 +22,7 @@ export class EnrollmentService {
     @Inject(ENROLLMENT_REPOSITORY)
     private readonly enrollmentRepository: IEnrollmentRepository,
     private readonly userService: UserService,
+    @Inject(forwardRef(() => CourseService))
     private readonly courseService: CourseService,
   ) {}
 
@@ -65,5 +67,14 @@ export class EnrollmentService {
     }
 
     return enrollment;
+  }
+
+  async findAllByUser(user: User): Promise<Enrollment[] | null> {
+    const result = (await this.enrollmentRepository.findAllByUser(
+      user,
+    )) as Enrollment[];
+
+    console.log(result);
+    return result;
   }
 }

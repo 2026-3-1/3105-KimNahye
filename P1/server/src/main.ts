@@ -56,10 +56,7 @@ async function bootstrap() {
 
   //cors
   app.enableCors({
-    origin:
-      configService.get<string>('NODE_ENV') === 'production'
-        ? ['http://localhost:3000']
-        : true,
+    origin: true, // 일단 전체 허용
     credentials: true,
   });
 

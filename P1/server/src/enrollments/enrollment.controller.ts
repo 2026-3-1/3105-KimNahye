@@ -18,7 +18,7 @@ import { Enrollment } from './entities/enrollment.entity';
 import { ApiResponseDto } from '@common/dto/api-response.dto';
 import { ApiEnroll } from './decorators/enrollment-swagger.decorator';
 
-@Controller('enrollments')
+@Controller()
 export class EnrollmentController {
   constructor(private readonly enrollmentService: EnrollmentService) {}
 

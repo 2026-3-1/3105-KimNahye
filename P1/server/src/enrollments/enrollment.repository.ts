@@ -13,6 +13,16 @@ export class EnrollmentRepository implements IEnrollmentRepository {
     @InjectRepository(Enrollment)
     private readonly repo: Repository<Enrollment>,
   ) {}
+  async findAllByUser(user: User): Promise<Enrollment[] | null> {
+    const result = await this.repo.find({
+      where: { user: { id: user.id } },
+      relations: ['course', 'course.teacher'],
+    });
+
+    console.log(result);
+
+    return result.length > 0 ? result : null;
+  }
 
   async findByUserAndCourse(
     user: User,
