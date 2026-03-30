@@ -12,6 +12,7 @@ import { useEffect } from "react"
 import { getMyInfo } from "./api/UserApi"
 import VideoDetailPage from "./pages/VideoDetail"
 import CreateCourse from "./pages/CreateCourse"
+import RegisterVideo from "./pages/RegisterVideo"
 
 export default function App() {
   const { isAuthenticated, setUser } = useAuthStore()
@@ -32,10 +33,11 @@ export default function App() {
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/courses" element={<Courses />} />
-        <Route path="/my-courses" element={<MyCourses />} />
-        <Route path="/courses/:id" element={<CourseDetailPage />} />
-        <Route path="/videos/:id" element={<VideoDetailPage />} />
         <Route path="/courses/create" element={<CreateCourse />} />
+        <Route path="/courses/:id" element={<CourseDetailPage />} />
+        <Route path="/my-courses" element={<MyCourses />} />
+        <Route path="/videos/register/:courseId" element={<RegisterVideo />} />
+        <Route path="/videos/:id" element={<VideoDetailPage />} />
         <Route path="/login" element={<Login />} />
         <Route path="/signup" element={<Signup />} />
         <Route path="/profile" element={<Profile />} />

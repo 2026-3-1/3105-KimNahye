@@ -12,6 +12,7 @@ import {
 import { CourseModule } from './courses/course.module';
 import { VideosModule } from './videos/video.module';
 import { EnrollmentsModule } from './enrollments/enrollment.module';
+import { TeacherModule } from './teacher/teacher.module';
 
 @Module({
   imports: [
@@ -41,6 +42,7 @@ import { EnrollmentsModule } from './enrollments/enrollment.module';
     CourseModule,
     VideosModule,
     EnrollmentsModule,
+    TeacherModule,
   ],
   providers: [
     // 전역 ValidationPipe

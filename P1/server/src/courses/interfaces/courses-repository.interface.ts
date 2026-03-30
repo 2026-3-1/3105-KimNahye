@@ -24,6 +24,8 @@ export interface ICourseRepository {
     difficulty: Difficulty,
     requiredTools: string[],
   ): Promise<Course | null>;
+
+  findByTeacher(teacher: User): Promise<Course[] | null>;
 }
 
 export const COURSE_REPOSITORY = Symbol('ICourseRepository');

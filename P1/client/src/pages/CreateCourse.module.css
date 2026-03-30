@@ -449,3 +449,26 @@
   opacity: 0.5;
   cursor: not-allowed;
 }
+
+.successBox {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 18px;
+  background: #f0fff4;
+  border: 1.5px solid #6fcf97;
+  border-radius: var(--radius-sm);
+  font-size: 14px;
+  font-weight: 700;
+  color: #219653;
+}
+
+.courseIdBadge {
+  font-size: 11px;
+  font-weight: 600;
+  color: #555;
+  background: #e8f5e9;
+  padding: 3px 10px;
+  border-radius: 20px;
+  font-family: monospace;
+}

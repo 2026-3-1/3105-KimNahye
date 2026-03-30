@@ -14,6 +14,12 @@ export class CourseRepository implements ICourseRepository {
     @InjectRepository(Course)
     private readonly repo: Repository<Course>,
   ) {}
+  async findByTeacher(teacher: User): Promise<Course[] | null> {
+    const result = await this.repo.findBy(teacher);
+
+    return result;
+  }
+
   async create(
     teacher: User,
     category: Category,

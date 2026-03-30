@@ -352,6 +352,24 @@
   color: var(--text-primary);
 }
 
+.addVideoBtn {
+  display: block;
+  width: 100%;
+  padding: 14px;
+  background: var(--primary);
+  color: #fff;
+  border: none;
+  border-radius: var(--radius-sm);
+  font-size: 15px;
+  font-weight: 700;
+  font-family: inherit;
+  cursor: pointer;
+  transition: background var(--transition);
+}
+.addVideoBtn:hover {
+  background: var(--primary-dark);
+}
+
 /* ── 스켈레톤 ─────────────────────────────────────────────── */
 @keyframes shimmer {
   0% {
@@ -386,6 +404,10 @@
 }
 .skeletonLine:nth-child(3) {
   width: 55%;
+}
+
+.teacherActions {
+  padding: 20px 24px;
 }
 
 /* ── 에러 ─────────────────────────────────────────────────── */

@@ -237,12 +237,15 @@ export default function CourseDetailPage() {
                 <p className={styles.enrollError}>{enrollError}</p>
               )}
 
-              {enrollSuccess ? (
+              {isTeacher ? (
+                <button
+                  className={styles.addVideoBtn}
+                  onClick={() => navigate(`/videos/register/${id}`)}
+                >
+                  + 영상 등록
+                </button>
+              ) : enrollSuccess ? (
                 <div className={styles.enrollDone}>✅ 수강 신청 완료!</div>
-              ) : isTeacher ? (
-                <div className={styles.teacherNote}>
-                  선생님 계정은 수강 신청을 할 수 없습니다.
-                </div>
               ) : (
                 <button
                   className={styles.enrollBtn}

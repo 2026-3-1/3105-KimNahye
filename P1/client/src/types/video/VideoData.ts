@@ -1,8 +1,8 @@
 export type VideoData = {
   id: string
-  youtube_video_id: string
+  youtubeVideoId: string
   title: string
-  thumbnail_url: string
+  thumbnailUrl: string
   duration: number // 초 단위
   created_at: string // ISO8601
 }
