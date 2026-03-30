@@ -15,9 +15,12 @@ export class CourseRepository implements ICourseRepository {
     private readonly repo: Repository<Course>,
   ) {}
   async findByTeacher(teacher: User): Promise<Course[] | null> {
-    const result = await this.repo.findBy(teacher);
+    const result = await this.repo.find({
+      where: { teacher: { id: teacher.id } },
+      relations: ['teacher', 'videos'],
+    });
 
-    return result;
+    return result.length > 0 ? result : null;
   }
 
   async create(

@@ -13,6 +13,7 @@ import { getMyInfo } from "./api/UserApi"
 import VideoDetailPage from "./pages/VideoDetail"
 import CreateCourse from "./pages/CreateCourse"
 import RegisterVideo from "./pages/RegisterVideo"
+import TeacherCourses from "./pages/TeacherCourse"
 
 export default function App() {
   const { isAuthenticated, setUser } = useAuthStore()
@@ -34,6 +35,7 @@ export default function App() {
         <Route path="/" element={<Home />} />
         <Route path="/courses" element={<Courses />} />
         <Route path="/courses/create" element={<CreateCourse />} />
+        <Route path="/teacher" element={<TeacherCourses />} />
         <Route path="/courses/:id" element={<CourseDetailPage />} />
         <Route path="/my-courses" element={<MyCourses />} />
         <Route path="/videos/register/:courseId" element={<RegisterVideo />} />
