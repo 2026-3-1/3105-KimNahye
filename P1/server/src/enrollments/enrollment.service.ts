@@ -73,8 +73,6 @@ export class EnrollmentService {
     const result = (await this.enrollmentRepository.findAllByUser(
       user,
     )) as Enrollment[];
-
-    console.log(result);
     return result;
   }
 }
