@@ -19,8 +19,6 @@ export class EnrollmentRepository implements IEnrollmentRepository {
       relations: ['course', 'course.teacher'],
     });
 
-    console.log(result);
-
     return result.length > 0 ? result : null;
   }
 

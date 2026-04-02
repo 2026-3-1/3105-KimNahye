@@ -22,13 +22,28 @@ const FEATURES: Feature[] = [
   },
 ]
 
-const CATEGORIES = ["한식", "양식", "중식", "일식", "디저트"] as const
+const CATEGORIES = [
+  "KOREAN",
+  "JAPANESE",
+  "CHINESE",
+  "WESTERN",
+  "BAKING",
+] as const
+
 const EMOJI_MAP: Record<string, string> = {
-  한식: "🍚",
-  양식: "🍝",
-  중식: "🥢",
-  일식: "🍱",
-  디저트: "🍰",
+  KOREAN: "🍚",
+  JAPANESE: "🍱",
+  CHINESE: "🥢",
+  WESTERN: "🍝",
+  BAKING: "🍰",
+}
+
+const LABEL_MAP: Record<string, string> = {
+  KOREAN: "한식",
+  JAPANESE: "일식",
+  CHINESE: "중식",
+  WESTERN: "양식",
+  BAKING: "베이킹",
 }
 
 export default function Home() {
@@ -80,7 +95,7 @@ export default function Home() {
                 className={styles.categoryCard}
               >
                 <span className={styles.categoryEmoji}>{EMOJI_MAP[cat]}</span>
-                <span className={styles.categoryName}>{cat}</span>
+                <span className={styles.categoryName}>{LABEL_MAP[cat]}</span>
               </Link>
             ))}
           </div>
