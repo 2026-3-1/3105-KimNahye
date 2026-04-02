@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react"
 import { useNavigate } from "react-router-dom"
-import { getMyInfo } from "../api/UserApi"
+import { getMyInfo, updateMyInfo } from "../api/UserApi"
 import useAuthStore from "../store/AuthStore"
 import type { UserProfile } from "../types/user/UserProfile"
 import type { AxiosError } from "axios"
@@ -13,11 +13,17 @@ const ROLE_LABEL: Record<string, string> = {
 
 export default function Profile() {
   const navigate = useNavigate()
-  const { isAuthenticated, logout } = useAuthStore()
+  const { isAuthenticated, logout, setUser } = useAuthStore()
 
   const [profile, setProfile] = useState<UserProfile | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string>("")
+
+  const [editing, setEditing] = useState(false)
+  const [editEmail, setEditEmail] = useState("")
+  const [editNickname, setEditNickname] = useState("")
+  const [updateLoading, setUpdateLoading] = useState(false)
+  const [updateError, setUpdateError] = useState("")
 
   useEffect(() => {
     if (!isAuthenticated) {
@@ -45,6 +51,46 @@ export default function Profile() {
 
     fetch()
   }, [isAuthenticated])
+
+  const handleEditStart = () => {
+    if (!profile) return
+    setEditEmail(profile.email)
+    setEditNickname(profile.nickname)
+    setUpdateError("")
+    setEditing(true)
+  }
+
+  const handleEditCancel = () => {
+    setEditing(false)
+    setUpdateError("")
+  }
+
+  const handleUpdate = async () => {
+    setUpdateLoading(true)
+    setUpdateError("")
+    try {
+      const { data } = await updateMyInfo({
+        email: editEmail,
+        nickname: editNickname,
+      })
+      const result = (data as any)?.data ?? data
+      const updated: UserProfile = {
+        ...profile!,
+        email: result.email,
+        nickname: result.nickname,
+      }
+      setProfile(updated)
+      setUser(updated)
+      setEditing(false)
+    } catch (err) {
+      const axiosError = err as AxiosError<{ message: string }>
+      setUpdateError(
+        axiosError.response?.data?.message ?? "수정에 실패했습니다.",
+      )
+    } finally {
+      setUpdateLoading(false)
+    }
+  }
 
   const handleLogout = () => {
     logout()
@@ -96,26 +142,70 @@ export default function Profile() {
 
           <div className={styles.divider} />
 
-          <div className={styles.details}>
-            <div className={styles.detailRow}>
-              <span className={styles.detailLabel}>이메일</span>
-              <span className={styles.detailValue}>{profile.email}</span>
+          {editing ? (
+            <div className={styles.editForm}>
+              <div className={styles.editField}>
+                <label className={styles.editLabel}>이메일</label>
+                <input
+                  type="email"
+                  className={styles.editInput}
+                  value={editEmail}
+                  onChange={(e) => setEditEmail(e.target.value)}
+                />
+              </div>
+              <div className={styles.editField}>
+                <label className={styles.editLabel}>닉네임</label>
+                <input
+                  type="text"
+                  className={styles.editInput}
+                  value={editNickname}
+                  onChange={(e) => setEditNickname(e.target.value)}
+                />
+              </div>
+              {updateError && (
+                <p className={styles.updateError}>{updateError}</p>
+              )}
+              <div className={styles.editBtns}>
+                <button
+                  className={styles.saveBtn}
+                  onClick={handleUpdate}
+                  disabled={updateLoading}
+                >
+                  {updateLoading ? "저장 중..." : "저장"}
+                </button>
+                <button className={styles.cancelBtn} onClick={handleEditCancel}>
+                  취소
+                </button>
+              </div>
             </div>
-            <div className={styles.detailRow}>
-              <span className={styles.detailLabel}>역할</span>
-              <span className={styles.detailValue}>
-                {ROLE_LABEL[profile.role]}
-              </span>
+          ) : (
+            <div className={styles.details}>
+              <div className={styles.detailRow}>
+                <span className={styles.detailLabel}>이메일</span>
+                <span className={styles.detailValue}>{profile.email}</span>
+              </div>
+              <div className={styles.detailRow}>
+                <span className={styles.detailLabel}>닉네임</span>
+                <span className={styles.detailValue}>{profile.nickname}</span>
+              </div>
+              <div className={styles.detailRow}>
+                <span className={styles.detailLabel}>역할</span>
+                <span className={styles.detailValue}>
+                  {ROLE_LABEL[profile.role]}
+                </span>
+              </div>
+              <div className={styles.detailRow}>
+                <span className={styles.detailLabel}>가입일</span>
+                <span className={styles.detailValue}>
+                  {new Date(profile.createdAt).toLocaleDateString("ko-KR")}
+                </span>
+              </div>
+              <button className={styles.editBtn} onClick={handleEditStart}>
+                정보 수정
+              </button>
             </div>
-            <div className={styles.detailRow}>
-              <span className={styles.detailLabel}>가입일</span>
-              <span className={styles.detailValue}>
-                {new Date(profile.createdAt).toLocaleDateString("ko-KR")}
-              </span>
-            </div>
-          </div>
+          )}
         </div>
-
         {/* 액션 버튼 */}
         <div className={styles.actions}>
           <button

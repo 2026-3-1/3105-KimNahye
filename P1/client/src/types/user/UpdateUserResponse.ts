@@ -1,6 +1,5 @@
 export type UpdateUserResponseData = {
   id: string
+  email: string
   nickname: string
-  owned_tools: string[]
-  level: number
 }
