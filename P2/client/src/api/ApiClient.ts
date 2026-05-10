@@ -14,20 +14,28 @@ apiClient.interceptors.request.use((config) => {
   return config
 })
 
+const AUTH_ENDPOINTS = ["/auth/login", "/auth/register", "/auth/refresh"]
+
 apiClient.interceptors.response.use(
   (res) => res,
   async (error) => {
     const original = error.config
-    if (error.response?.status === 401 && !original._retry) {
+    const isAuthEndpoint = AUTH_ENDPOINTS.some((path) =>
+      original?.url?.includes(path),
+    )
+
+    if (
+      error.response?.status === 401 &&
+      !original._retry &&
+      !isAuthEndpoint
+    ) {
       original._retry = true
       try {
         const refreshToken = localStorage.getItem("refreshToken")
-        const { data } = await axios.post(
-          `${API_BASE_URL}/api/v1/auth/refresh`,
-          {
-            refreshToken,
-          },
-        )
+        if (!refreshToken) throw new Error("no refresh token")
+        const { data } = await axios.post(`${API_BASE_URL}/auth/refresh`, {
+          refreshToken,
+        })
         localStorage.setItem("accessToken", data.accessToken)
         localStorage.setItem("refreshToken", data.refreshToken)
         original.headers.Authorization = `Bearer ${data.accessToken}`

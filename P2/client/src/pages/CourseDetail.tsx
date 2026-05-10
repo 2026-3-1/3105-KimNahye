@@ -3,7 +3,7 @@ import { useParams, useNavigate } from "react-router-dom"
 import { getCourse } from "../api/CourseApi"
 import { enrollCourse } from "../api/EnrollmentApi"
 import { addToCart } from "../api/CartApi"
-import { getCourseReviews, createReview, deleteReview } from "../api/ReviewApi"
+import { getCourseReviews, createReview, updateReview, deleteReview } from "../api/ReviewApi"
 import useAuthStore from "../store/AuthStore"
 import type { CourseDetail } from "../types/course/CourseDetail"
 import type { AxiosError } from "axios"
@@ -75,6 +75,12 @@ export default function CourseDetailPage() {
   const [reviewContent, setReviewContent] = useState("")
   const [reviewSubmitting, setReviewSubmitting] = useState(false)
   const [reviewError, setReviewError] = useState("")
+
+  const [editingReviewId, setEditingReviewId] = useState<string | null>(null)
+  const [editRating, setEditRating] = useState(5)
+  const [editContent, setEditContent] = useState("")
+  const [editSubmitting, setEditSubmitting] = useState(false)
+  const [editError, setEditError] = useState("")
 
   useEffect(() => {
     if (!id) return
@@ -162,6 +168,43 @@ export default function CourseDetailPage() {
       setReviews((prev) => prev.filter((r) => r.id !== reviewId))
     } catch {
       alert("리뷰 삭제에 실패했습니다.")
+    }
+  }
+
+  const handleStartEdit = (review: Review) => {
+    setEditingReviewId(review.id)
+    setEditRating(review.rating)
+    setEditContent(review.content)
+    setEditError("")
+  }
+
+  const handleCancelEdit = () => {
+    setEditingReviewId(null)
+    setEditError("")
+  }
+
+  const handleSaveEdit = async (reviewId: string) => {
+    if (!id) return
+    if (!editContent.trim()) {
+      setEditError("리뷰 내용을 입력하세요.")
+      return
+    }
+    setEditSubmitting(true)
+    setEditError("")
+    try {
+      const { data } = await updateReview(id, reviewId, editRating, editContent)
+      const updated = (data as any)?.data ?? data
+      setReviews((prev) =>
+        prev.map((r) => (r.id === reviewId ? { ...r, ...updated } : r)),
+      )
+      setEditingReviewId(null)
+    } catch (err) {
+      const axiosError = err as AxiosError<{ message: string }>
+      setEditError(
+        axiosError.response?.data?.message ?? "리뷰 수정에 실패했습니다.",
+      )
+    } finally {
+      setEditSubmitting(false)
     }
   }
 
@@ -269,7 +312,7 @@ export default function CourseDetailPage() {
                   </div>
                   <textarea
                     className={styles.reviewTextarea}
-                    placeholder="리뷰를 작성하세요 (강의를 80% 이상 수강한 후 작성 가능합니다)"
+                    placeholder="리뷰를 작성하세요 (영상 1개 이상 수강 완료 후 작성 가능합니다)"
                     value={reviewContent}
                     onChange={(e) => setReviewContent(e.target.value)}
                     rows={3}
@@ -289,19 +332,57 @@ export default function CourseDetailPage() {
                 {reviews.length === 0 ? (
                   <p className={styles.noReview}>아직 리뷰가 없습니다.</p>
                 ) : (
-                  reviews.map((review) => (
-                    <div key={review.id} className={styles.reviewItem}>
-                      <div className={styles.reviewHeader}>
-                        <span className={styles.reviewNickname}>{review.userNickname}</span>
-                        <StarRating rating={review.rating} />
-                        <span className={styles.reviewDate}>{new Date(review.createdAt).toLocaleDateString("ko-KR")}</span>
-                        {user?.id === review.userId && (
-                          <button className={styles.reviewDeleteBtn} onClick={() => handleDeleteReview(review.id)}>삭제</button>
+                  reviews.map((review) => {
+                    const isEditing = editingReviewId === review.id
+                    const isMine = user?.id === review.userId
+                    return (
+                      <div key={review.id} className={styles.reviewItem}>
+                        <div className={styles.reviewHeader}>
+                          <span className={styles.reviewNickname}>{review.userNickname}</span>
+                          <StarRating
+                            rating={isEditing ? editRating : review.rating}
+                            onSelect={isEditing ? setEditRating : undefined}
+                          />
+                          <span className={styles.reviewDate}>{new Date(review.createdAt).toLocaleDateString("ko-KR")}</span>
+                          {isMine && !isEditing && (
+                            <>
+                              <button className={styles.reviewEditBtn} onClick={() => handleStartEdit(review)}>수정</button>
+                              <button className={styles.reviewDeleteBtn} onClick={() => handleDeleteReview(review.id)}>삭제</button>
+                            </>
+                          )}
+                        </div>
+                        {isEditing ? (
+                          <div className={styles.reviewEditForm}>
+                            <textarea
+                              className={styles.reviewTextarea}
+                              value={editContent}
+                              onChange={(e) => setEditContent(e.target.value)}
+                              rows={3}
+                            />
+                            {editError && <p className={styles.reviewError}>{editError}</p>}
+                            <div className={styles.reviewEditActions}>
+                              <button
+                                className={styles.reviewSubmitBtn}
+                                onClick={() => handleSaveEdit(review.id)}
+                                disabled={editSubmitting || !editContent.trim()}
+                              >
+                                {editSubmitting ? "저장 중..." : "저장"}
+                              </button>
+                              <button
+                                className={styles.reviewCancelBtn}
+                                onClick={handleCancelEdit}
+                                disabled={editSubmitting}
+                              >
+                                취소
+                              </button>
+                            </div>
+                          </div>
+                        ) : (
+                          <p className={styles.reviewContent}>{review.content}</p>
                         )}
                       </div>
-                      <p className={styles.reviewContent}>{review.content}</p>
-                    </div>
-                  ))
+                    )
+                  })
                 )}
               </div>
             </section>

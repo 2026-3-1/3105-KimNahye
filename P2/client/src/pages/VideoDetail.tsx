@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, useCallback } from "react"
+import { useState, useEffect, useRef } from "react"
 import { useParams, useNavigate } from "react-router-dom"
 import { getVideo } from "../api/VideoApi"
 import { updateProgress, getProgress } from "../api/WatchLogApi"
@@ -7,6 +7,13 @@ import useAuthStore from "../store/AuthStore"
 import type { VideoDetail } from "../types/video/VideoDetail"
 import type { AxiosError } from "axios"
 import styles from "./VideoDetail.module.css"
+
+declare global {
+  interface Window {
+    YT: any
+    onYouTubeIframeAPIReady: (() => void) | undefined
+  }
+}
 
 function formatDuration(seconds: number): string {
   const m = Math.floor(seconds / 60)
@@ -37,13 +44,18 @@ export default function VideoDetailPage() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string>("")
 
-  const [watchedDuration, setWatchedDuration] = useState(0)
+  const [initialPosition, setInitialPosition] = useState(0)
+  const [progressLoaded, setProgressLoaded] = useState(false)
+  const [currentTime, setCurrentTime] = useState(0)
+  const [isCompleted, setIsCompleted] = useState(false)
+  const [completing, setCompleting] = useState(false)
+
   const [bookmarks, setBookmarks] = useState<Bookmark[]>([])
   const [bookmarkNote, setBookmarkNote] = useState("")
   const [showBookmarkPanel, setShowBookmarkPanel] = useState(false)
 
-  const playerRef = useRef<HTMLIFrameElement>(null)
-  const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null)
+  const playerContainerRef = useRef<HTMLDivElement>(null)
+  const ytPlayerRef = useRef<any>(null)
 
   useEffect(() => {
     if (!id) return
@@ -56,7 +68,10 @@ export default function VideoDetailPage() {
         setVideo(detail)
       } catch (err) {
         const axiosError = err as AxiosError<{ message: string }>
-        setError(axiosError.response?.data?.message ?? "영상 정보를 불러오는 데 실패했습니다.")
+        setError(
+          axiosError.response?.data?.message ??
+            "영상 정보를 불러오는 데 실패했습니다.",
+        )
       } finally {
         setLoading(false)
       }
@@ -64,17 +79,24 @@ export default function VideoDetailPage() {
     fetch()
   }, [id])
 
-  // 이어보기: 시청 위치 조회
+  // 이어보기 위치 조회
   useEffect(() => {
-    if (!id || !isAuthenticated) return
+    if (!id) return
+    if (!isAuthenticated) {
+      setProgressLoaded(true)
+      return
+    }
     getProgress(id)
       .then(({ data }) => {
         const progress = (data as any)?.data ?? data
         if (progress?.watchedDuration > 0) {
-          setWatchedDuration(progress.watchedDuration)
+          setInitialPosition(progress.watchedDuration)
+          setCurrentTime(progress.watchedDuration)
         }
+        if (progress?.isCompleted) setIsCompleted(true)
       })
       .catch(() => {})
+      .finally(() => setProgressLoaded(true))
   }, [id, isAuthenticated])
 
   // 북마크 목록 조회
@@ -88,35 +110,117 @@ export default function VideoDetailPage() {
       .catch(() => {})
   }, [id, isAuthenticated])
 
-  // 30초마다 progress 저장 (간이 구현: 카운터 기반)
-  const progressRef = useRef(watchedDuration)
+  // YouTube IFrame API 로드 + 플레이어 생성
   useEffect(() => {
-    progressRef.current = watchedDuration
-  }, [watchedDuration])
+    if (!video || !progressLoaded || !playerContainerRef.current) return
 
-  const saveProgress = useCallback(() => {
-    if (!id || !isAuthenticated) return
-    const current = progressRef.current + 30
-    progressRef.current = current
-    setWatchedDuration(current)
-    const isCompleted = video ? current / video.duration >= 0.9 : false
-    updateProgress(id, current, isCompleted).catch(() => {})
-  }, [id, isAuthenticated, video])
-
-  useEffect(() => {
-    if (!video || !isAuthenticated) return
-    intervalRef.current = setInterval(saveProgress, 30000)
-    return () => {
-      if (intervalRef.current) clearInterval(intervalRef.current)
+    const initPlayer = () => {
+      if (!playerContainerRef.current || !window.YT?.Player) return
+      ytPlayerRef.current = new window.YT.Player(playerContainerRef.current, {
+        videoId: video.youtubeVideoId,
+        playerVars: {
+          start: initialPosition,
+          enablejsapi: 1,
+          rel: 0,
+        },
+      })
     }
-  }, [video, isAuthenticated, saveProgress])
+
+    if (window.YT?.Player) {
+      initPlayer()
+    } else {
+      const existing = document.getElementById("youtube-iframe-api")
+      if (!existing) {
+        const tag = document.createElement("script")
+        tag.id = "youtube-iframe-api"
+        tag.src = "https://www.youtube.com/iframe_api"
+        document.body.appendChild(tag)
+      }
+      window.onYouTubeIframeAPIReady = initPlayer
+    }
+
+    return () => {
+      try {
+        ytPlayerRef.current?.destroy?.()
+      } catch {
+        /* noop */
+      }
+      ytPlayerRef.current = null
+    }
+  }, [video, progressLoaded, initialPosition])
+
+  // 현재 재생 위치 1초마다 갱신 (버튼 라벨 표시용)
+  useEffect(() => {
+    if (!video || !progressLoaded) return
+    const t = setInterval(() => {
+      try {
+        const sec = ytPlayerRef.current?.getCurrentTime?.()
+        if (typeof sec === "number" && sec >= 0) {
+          setCurrentTime(Math.floor(sec))
+        }
+      } catch {
+        /* noop */
+      }
+    }, 1000)
+    return () => clearInterval(t)
+  }, [video, progressLoaded])
+
+  // 30초마다 실제 재생 위치를 서버에 저장
+  useEffect(() => {
+    if (!video || !isAuthenticated || !id) return
+    const interval = setInterval(() => {
+      try {
+        const time = ytPlayerRef.current?.getCurrentTime?.()
+        if (typeof time !== "number" || time <= 0) return
+        const sec = Math.floor(time)
+        const isCompleted = sec / video.duration >= 0.9
+        updateProgress(id, sec, isCompleted).catch(() => {})
+      } catch {
+        /* noop */
+      }
+    }, 30000)
+    return () => clearInterval(interval)
+  }, [video, isAuthenticated, id])
+
+  const handleMarkCompleted = async () => {
+    if (!id || !isAuthenticated || completing || isCompleted) return
+    setCompleting(true)
+    let pos = currentTime
+    try {
+      const time = ytPlayerRef.current?.getCurrentTime?.()
+      if (typeof time === "number" && time >= 0) {
+        pos = Math.floor(time)
+      }
+    } catch {
+      /* noop */
+    }
+    try {
+      await updateProgress(id, pos, true)
+      setIsCompleted(true)
+    } catch {
+      alert("수강 완료 처리에 실패했습니다.")
+    } finally {
+      setCompleting(false)
+    }
+  }
 
   const handleAddBookmark = async () => {
     if (!id || !isAuthenticated) return
+    let pos = currentTime
     try {
-      const { data } = await addBookmark(id, watchedDuration, bookmarkNote || undefined)
+      const time = ytPlayerRef.current?.getCurrentTime?.()
+      if (typeof time === "number" && time >= 0) {
+        pos = Math.floor(time)
+      }
+    } catch {
+      /* noop */
+    }
+    try {
+      const { data } = await addBookmark(id, pos, bookmarkNote || undefined)
       const bookmark = (data as any)?.data ?? data
-      setBookmarks((prev) => [...prev, bookmark].sort((a, b) => a.positionSec - b.positionSec))
+      setBookmarks((prev) =>
+        [...prev, bookmark].sort((a, b) => a.positionSec - b.positionSec),
+      )
       setBookmarkNote("")
     } catch {
       alert("북마크 추가에 실패했습니다.")
@@ -163,8 +267,6 @@ export default function VideoDetailPage() {
     )
   }
 
-  const startSeconds = watchedDuration > 0 ? `&start=${watchedDuration}` : ""
-
   return (
     <div className={styles.page}>
       <div className={styles.inner}>
@@ -175,23 +277,18 @@ export default function VideoDetailPage() {
         <div className={styles.layout}>
           <div className={styles.mainContent}>
             <div className={styles.playerWrap}>
-              <iframe
-                ref={playerRef}
-                className={styles.player}
-                src={`https://www.youtube.com/embed/${video.youtubeVideoId}?enablejsapi=1${startSeconds}`}
-                title={video.title}
-                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                allowFullScreen
-              />
+              <div ref={playerContainerRef} className={styles.player} />
             </div>
 
             <div className={styles.info}>
               <h1 className={styles.title}>{video.title}</h1>
               <div className={styles.meta}>
-                <span className={styles.metaItem}>⏱ {formatDuration(video.duration)}</span>
-                {watchedDuration > 0 && (
+                <span className={styles.metaItem}>
+                  ⏱ {formatDuration(video.duration)}
+                </span>
+                {currentTime > 0 && (
                   <span className={styles.metaItem}>
-                    📍 {formatSec(watchedDuration)} 까지 시청
+                    📍 {formatSec(currentTime)} 재생 중
                   </span>
                 )}
                 <a
@@ -203,6 +300,23 @@ export default function VideoDetailPage() {
                   ▶ YouTube에서 보기
                 </a>
               </div>
+
+              {isAuthenticated && (
+                <div className={styles.completeBox}>
+                  <button
+                    className={styles.completeBtn}
+                    onClick={handleMarkCompleted}
+                    disabled={completing || isCompleted}
+                    data-completed={isCompleted}
+                  >
+                    {isCompleted
+                      ? "✅ 수강 완료됨"
+                      : completing
+                        ? "처리 중..."
+                        : "✓ 이 영상 수강 완료"}
+                  </button>
+                </div>
+              )}
 
               {isAuthenticated && (
                 <div className={styles.bookmarkAdd}>
@@ -217,13 +331,14 @@ export default function VideoDetailPage() {
                     className={styles.bookmarkBtn}
                     onClick={handleAddBookmark}
                   >
-                    🔖 현재 위치 북마크 ({formatSec(watchedDuration)})
+                    🔖 현재 위치 북마크 ({formatSec(currentTime)})
                   </button>
                   <button
                     className={styles.bookmarkToggle}
                     onClick={() => setShowBookmarkPanel((prev) => !prev)}
                   >
-                    북마크 목록 {showBookmarkPanel ? "▲" : "▼"} ({bookmarks.length})
+                    북마크 목록 {showBookmarkPanel ? "▲" : "▼"} (
+                    {bookmarks.length})
                   </button>
                 </div>
               )}
@@ -239,8 +354,12 @@ export default function VideoDetailPage() {
                 <ul className={styles.bookmarkList}>
                   {bookmarks.map((b) => (
                     <li key={b.id} className={styles.bookmarkItem}>
-                      <span className={styles.bookmarkTime}>{formatSec(b.positionSec)}</span>
-                      <span className={styles.bookmarkNote}>{b.note || "—"}</span>
+                      <span className={styles.bookmarkTime}>
+                        {formatSec(b.positionSec)}
+                      </span>
+                      <span className={styles.bookmarkNote}>
+                        {b.note || "—"}
+                      </span>
                       <button
                         className={styles.bookmarkDeleteBtn}
                         onClick={() => handleDeleteBookmark(b.id)}
