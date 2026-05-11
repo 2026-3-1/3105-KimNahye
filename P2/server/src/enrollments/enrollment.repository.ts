@@ -16,7 +16,7 @@ export class EnrollmentRepository implements IEnrollmentRepository {
   async findAllByUser(user: User): Promise<Enrollment[] | null> {
     const result = await this.repo.find({
       where: { user: { id: user.id } },
-      relations: ['course', 'course.teacher'],
+      relations: ['course', 'course.teacher', 'course.videos'],
     });
 
     return result.length > 0 ? result : null;

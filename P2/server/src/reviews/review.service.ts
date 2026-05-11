@@ -46,13 +46,12 @@ export class ReviewService {
     const existing = await this.reviewRepository.findByUserAndCourse(user, course);
     if (existing) throw new ConflictException('이미 리뷰를 작성하셨습니다.');
 
-    // 80% 수강 검증
+    // 최소 1개 영상 수강 완료 검증
     const videoIds = (course.videos ?? []).map((v) => v.id);
-    const total = videoIds.length;
-    if (total > 0) {
+    if (videoIds.length > 0) {
       const completedCount = await this.watchLogRepository.countCompleted(userId, videoIds);
-      if (completedCount / total < 0.8) {
-        throw new ForbiddenException('강의를 80% 이상 수강한 후 리뷰를 작성할 수 있습니다.');
+      if (completedCount < 1) {
+        throw new ForbiddenException('영상 1개 이상을 수강 완료한 후 리뷰를 작성할 수 있습니다.');
       }
     }
 
