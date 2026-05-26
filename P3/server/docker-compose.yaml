@@ -1,0 +1,53 @@
+version: '3.8'
+
+services:
+  nestjs:
+    ports:
+      - "8080:8080"
+    image: 3n1hye/solvingmeal-backend:latest
+    container_name: backend
+    restart: always
+    env_file:
+      - .env
+    depends_on:
+      - redis
+      - postgresql
+    networks:
+      - app-network
+
+  react:
+    image: 3n1hye/solvingmeal-frontend:latest
+    container_name: frontend
+    restart: always
+    ports:
+      - "3000:3000"
+    depends_on:
+      - nestjs
+    networks:
+      - app-network
+
+  redis:
+    image: redis:8.6
+    container_name: redis
+    restart: always
+    networks:
+      - app-network
+
+  postgresql:
+    image: postgres:18
+    container_name: postgresql
+    restart: always
+    environment:
+      POSTGRES_PASSWORD: 1234
+      POSTGRES_DB: solving-meal
+    volumes:
+      - postgres_data:/var/lib/postgresql
+    networks:
+      - app-network
+
+volumes:
+  postgres_data:
+
+networks:
+  app-network:
+    driver: bridge

@@ -5,7 +5,11 @@
       "Bash(./node_modules/.bin/tsc --noEmit)",
       "Bash(node node_modules/typescript/bin/tsc --noEmit)",
       "Bash(npm run *)",
-      "Bash(cmd *)"
+      "Bash(cmd *)",
+      "Bash(node *)",
+      "Bash(npm install *)",
+      "PowerShell(npm install *)",
+      "PowerShell(Copy-Item *)"
     ]
   }
 }

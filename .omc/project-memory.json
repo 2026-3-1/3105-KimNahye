@@ -1,0 +1,379 @@
+{
+  "version": "1.0.0",
+  "lastScanned": 1779755960087,
+  "projectRoot": "C:\\Users\\knhye\\solving-meal",
+  "techStack": {
+    "languages": [],
+    "frameworks": [],
+    "packageManager": null,
+    "runtime": null
+  },
+  "build": {
+    "buildCommand": null,
+    "testCommand": null,
+    "lintCommand": null,
+    "devCommand": null,
+    "scripts": {}
+  },
+  "conventions": {
+    "namingStyle": null,
+    "importStyle": null,
+    "testPattern": null,
+    "fileOrganization": null
+  },
+  "structure": {
+    "isMonorepo": false,
+    "workspaces": [],
+    "mainDirectories": [
+      "docs"
+    ],
+    "gitBranches": {
+      "defaultBranch": "main",
+      "branchingStrategy": null
+    }
+  },
+  "customNotes": [],
+  "directoryMap": {
+    "docs": {
+      "path": "docs",
+      "purpose": "Documentation",
+      "fileCount": 3,
+      "lastAccessed": 1779755960059,
+      "keyFiles": [
+        "3105김나혜_PRD.md",
+        "강사기능_요구사항명세서.md",
+        "사용자기능_요구사항명세서.md"
+      ]
+    },
+    "P1": {
+      "path": "P1",
+      "purpose": null,
+      "fileCount": 1,
+      "lastAccessed": 1779755960060,
+      "keyFiles": [
+        "README.md"
+      ]
+    },
+    "P2": {
+      "path": "P2",
+      "purpose": null,
+      "fileCount": 0,
+      "lastAccessed": 1779755960060,
+      "keyFiles": []
+    },
+    "P2\\docs": {
+      "path": "P2\\docs",
+      "purpose": "Documentation",
+      "fileCount": 11,
+      "lastAccessed": 1779755960062,
+      "keyFiles": [
+        "01-project-overview.md",
+        "02-data-model.md",
+        "03-api-design.md"
+      ]
+    }
+  },
+  "hotPaths": [
+    {
+      "path": "P2\\client\\.env",
+      "accessCount": 3,
+      "lastAccessed": 1779066299552,
+      "type": "file"
+    },
+    {
+      "path": "P2\\server\\package.json",
+      "accessCount": 2,
+      "lastAccessed": 1778855050425,
+      "type": "file"
+    },
+    {
+      "path": "P2\\server\\src\\main.ts",
+      "accessCount": 2,
+      "lastAccessed": 1778855055719,
+      "type": "file"
+    },
+    {
+      "path": "P2\\server\\src\\app.module.ts",
+      "accessCount": 2,
+      "lastAccessed": 1778855056342,
+      "type": "file"
+    },
+    {
+      "path": "P2\\server\\.env.example",
+      "accessCount": 2,
+      "lastAccessed": 1778855056781,
+      "type": "file"
+    },
+    {
+      "path": "P2\\docs\\10-dev-setup-guide.md",
+      "accessCount": 2,
+      "lastAccessed": 1778855094438,
+      "type": "file"
+    },
+    {
+      "path": "docs\\PRD.md",
+      "accessCount": 2,
+      "lastAccessed": 1778855589081,
+      "type": "file"
+    },
+    {
+      "path": "P2\\server\\src\\courses\\course.controller.ts",
+      "accessCount": 2,
+      "lastAccessed": 1779756536139,
+      "type": "file"
+    },
+    {
+      "path": "P2\\server\\src\\courses\\course.service.ts",
+      "accessCount": 2,
+      "lastAccessed": 1779756536353,
+      "type": "file"
+    },
+    {
+      "path": "P2\\server\\src\\courses\\entities\\course.entity.ts",
+      "accessCount": 2,
+      "lastAccessed": 1779756570700,
+      "type": "file"
+    },
+    {
+      "path": "P2\\server\\src",
+      "accessCount": 1,
+      "lastAccessed": 1778596113797,
+      "type": "directory"
+    },
+    {
+      "path": "P2\\server\\.env",
+      "accessCount": 1,
+      "lastAccessed": 1778596232312,
+      "type": "file"
+    },
+    {
+      "path": "P2\\client\\package.json",
+      "accessCount": 1,
+      "lastAccessed": 1778855050441,
+      "type": "file"
+    },
+    {
+      "path": "P2\\client\\vite.config.js",
+      "accessCount": 1,
+      "lastAccessed": 1778855057876,
+      "type": "file"
+    },
+    {
+      "path": "P2\\client\\index.html",
+      "accessCount": 1,
+      "lastAccessed": 1778855058850,
+      "type": "file"
+    },
+    {
+      "path": "P2\\client\\src\\main.tsx",
+      "accessCount": 1,
+      "lastAccessed": 1778855059331,
+      "type": "file"
+    },
+    {
+      "path": "P2\\client\\src\\App.tsx",
+      "accessCount": 1,
+      "lastAccessed": 1778855059791,
+      "type": "file"
+    },
+    {
+      "path": "P2\\client\\src\\index.css",
+      "accessCount": 1,
+      "lastAccessed": 1778855060277,
+      "type": "file"
+    },
+    {
+      "path": "P2\\client\\src\\App.css",
+      "accessCount": 1,
+      "lastAccessed": 1778855060658,
+      "type": "file"
+    },
+    {
+      "path": "P2\\server\\src\\common\\filters\\exception.filter.ts",
+      "accessCount": 1,
+      "lastAccessed": 1778855068762,
+      "type": "file"
+    },
+    {
+      "path": "P2\\server\\src\\common\\dto\\api-response.dto.ts",
+      "accessCount": 1,
+      "lastAccessed": 1778855069220,
+      "type": "file"
+    },
+    {
+      "path": "P2\\server\\src\\common\\enums\\user-role.enum.ts",
+      "accessCount": 1,
+      "lastAccessed": 1778855070280,
+      "type": "file"
+    },
+    {
+      "path": "P2\\server\\src\\common\\decorators\\get-user.decorator.ts",
+      "accessCount": 1,
+      "lastAccessed": 1778855070737,
+      "type": "file"
+    },
+    {
+      "path": "P2\\server\\src\\common\\decorators\\roles.decorator.ts",
+      "accessCount": 1,
+      "lastAccessed": 1778855071412,
+      "type": "file"
+    },
+    {
+      "path": "P2\\server\\src\\common\\guards\\roles.guard.ts",
+      "accessCount": 1,
+      "lastAccessed": 1778855072406,
+      "type": "file"
+    },
+    {
+      "path": "P2\\server\\src\\auth\\auth.controller.ts",
+      "accessCount": 1,
+      "lastAccessed": 1778855072890,
+      "type": "file"
+    },
+    {
+      "path": "P2\\server\\src\\auth\\services\\auth.service.ts",
+      "accessCount": 1,
+      "lastAccessed": 1778855073416,
+      "type": "file"
+    },
+    {
+      "path": "P2\\server\\src\\auth\\services\\token.service.ts",
+      "accessCount": 1,
+      "lastAccessed": 1778855073816,
+      "type": "file"
+    },
+    {
+      "path": "P2\\server\\src\\auth\\dto\\register-request.dto.ts",
+      "accessCount": 1,
+      "lastAccessed": 1778855074952,
+      "type": "file"
+    },
+    {
+      "path": "P2\\server\\src\\auth\\dto\\token-response.dto.ts",
+      "accessCount": 1,
+      "lastAccessed": 1778855075368,
+      "type": "file"
+    },
+    {
+      "path": "P2\\server\\src\\auth\\entities\\refresh-token.entity.ts",
+      "accessCount": 1,
+      "lastAccessed": 1778855075832,
+      "type": "file"
+    },
+    {
+      "path": "P2\\server\\src\\user\\user.controller.ts",
+      "accessCount": 1,
+      "lastAccessed": 1778855077025,
+      "type": "file"
+    },
+    {
+      "path": "P2\\server\\src\\user\\entities\\user.entity.ts",
+      "accessCount": 1,
+      "lastAccessed": 1778855077358,
+      "type": "file"
+    },
+    {
+      "path": "P2\\server\\src\\user\\dto\\update-user-request.dto.ts",
+      "accessCount": 1,
+      "lastAccessed": 1778855079808,
+      "type": "file"
+    },
+    {
+      "path": "P2\\server\\src\\user\\dto\\update-user-response.dto.ts",
+      "accessCount": 1,
+      "lastAccessed": 1778855079836,
+      "type": "file"
+    },
+    {
+      "path": "P2\\server\\src\\user\\user.service.ts",
+      "accessCount": 1,
+      "lastAccessed": 1778855079909,
+      "type": "file"
+    },
+    {
+      "path": "P2\\server\\src\\user\\dto\\user-detail-response.dto.ts",
+      "accessCount": 1,
+      "lastAccessed": 1778855079968,
+      "type": "file"
+    },
+    {
+      "path": "P2\\docs\\01-project-overview.md",
+      "accessCount": 1,
+      "lastAccessed": 1778855090158,
+      "type": "file"
+    },
+    {
+      "path": "P2\\docs\\02-data-model.md",
+      "accessCount": 1,
+      "lastAccessed": 1778855090641,
+      "type": "file"
+    },
+    {
+      "path": "P2\\docs\\03-api-design.md",
+      "accessCount": 1,
+      "lastAccessed": 1778855091060,
+      "type": "file"
+    },
+    {
+      "path": "P2\\docs\\04-architecture.md",
+      "accessCount": 1,
+      "lastAccessed": 1778855091588,
+      "type": "file"
+    },
+    {
+      "path": "P2\\docs\\05-auth-design.md",
+      "accessCount": 1,
+      "lastAccessed": 1778855092109,
+      "type": "file"
+    },
+    {
+      "path": "P2\\docs\\06-frontend-structure.md",
+      "accessCount": 1,
+      "lastAccessed": 1778855093023,
+      "type": "file"
+    },
+    {
+      "path": "P2\\docs\\07-backend-module-structure.md",
+      "accessCount": 1,
+      "lastAccessed": 1778855093617,
+      "type": "file"
+    },
+    {
+      "path": "P2\\server\\src\\courses\\entities\\enums\\category.enum.ts",
+      "accessCount": 1,
+      "lastAccessed": 1778855103932,
+      "type": "file"
+    },
+    {
+      "path": "P2\\server\\src\\courses\\entities\\enums\\difficulty.enum.ts",
+      "accessCount": 1,
+      "lastAccessed": 1778855105301,
+      "type": "file"
+    },
+    {
+      "path": "P2\\server\\src\\courses\\dto\\course-query.dto.ts",
+      "accessCount": 1,
+      "lastAccessed": 1778855105574,
+      "type": "file"
+    },
+    {
+      "path": "P2\\server\\src\\courses\\dto\\course-list-response.dto.ts",
+      "accessCount": 1,
+      "lastAccessed": 1778855105923,
+      "type": "file"
+    },
+    {
+      "path": "P2\\server\\src\\courses\\dto\\course-detail.response.dto.ts",
+      "accessCount": 1,
+      "lastAccessed": 1778855107004,
+      "type": "file"
+    },
+    {
+      "path": "P2\\server\\src\\courses\\dto\\create-course-request.dto.ts",
+      "accessCount": 1,
+      "lastAccessed": 1778855107392,
+      "type": "file"
+    }
+  ],
+  "userDirectives": []
+}
