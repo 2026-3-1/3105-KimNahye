@@ -1,7 +1,0 @@
-{
-  "tool_name": "PowerShell",
-  "tool_input_preview": "{\"command\":\"Get-Content \\\"C:\\\\Users\\\\knhye\\\\solving-meal\\\\P3\\\\server\\\\tsconfig.json\\\"\",\"description\":\"Check P3 server tsconfig for path aliases\"}",
-  "error": "Exit code 1\nGet-Content : Cannot find path 'C:\\Users\\knhye\\solving-meal\\P3\\server\\tsconfig.json' because it does\r\n not exist.\r\nAt line:1 char:1\r\n+ Get-Content \"C:\\Users\\knhye\\solving-meal\\P3\\server\\tsconfig.json\"\r\n+ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\r\n    + CategoryInfo          : ObjectNotFound: (C:\\Users\\knhye\\...r\\tsconfig.json:String) [Get-Conte \r\n   nt], ItemNotFoundException\r\n    + FullyQualifiedErrorId : PathNotFound,Microsoft.PowerShell.Commands.GetContentC...",
-  "timestamp": "2026-05-26T00:56:35.804Z",
-  "retry_count": 1
-}
