@@ -11,6 +11,14 @@
 | **class-validator / class-transformer** | DTO 기반 입력 검증 |
 | **Swagger (@nestjs/swagger)** | API 문서 자동 생성 |
 | **passport-jwt** | JWT Strategy 전략 구현 |
+| **helmet** | HTTP 보안 헤더 (XSS·클릭재킹 방어) |
+| **@nestjs/throttler** | Rate Limiting (로그인·회원가입 등) |
+| **@nestjs-modules/mailer + nodemailer** | 이메일 알림 발송 |
+| **@nestjs/schedule** | 크론 기반 배치 스케쥴러 |
+| **@nestjs/terminus** | 헬스체크 (`/health`) |
+| **prom-client + @willsoto/nestjs-prometheus** | Prometheus 메트릭 수집 |
+| **nest-winston + winston** | 구조화 JSON 로그 + 일별 파일 로테이션 |
+| **@nestjs/cache-manager + @keyv/redis + cache-manager** | Redis 응답 캐시 |
 
 ---
 
@@ -169,8 +177,9 @@
 
 | Method | Endpoint | Auth | 설명 |
 |---|---|---|---|
-| POST | `/teacher` | ✓ | 코스 생성 |
-| GET | `/teacher` | ✓ | 내 코스 목록 (선생님 기준) |
+| POST | `/teacher` | ✓ TEACHER | 코스 생성 |
+| GET | `/teacher` | ✓ TEACHER | 내 코스 목록 (선생님 기준) |
+| PATCH | `/teacher/:id` | ✓ TEACHER | 코스 수정 (본인 코스만) |
 
 ### POST `/teacher` — 코스 생성
 
@@ -179,11 +188,31 @@
 {
   "category": "BAKING",
   "difficulty": "MEDIUM",
-  "requiredTools": ["오븐", "믹서기"]
+  "requiredTools": ["오븐", "믹서기"],
+  "price": 0
 }
 ```
 
 **Response 201:** 생성된 코스 정보 반환
+
+### PATCH `/teacher/:id` — 코스 수정 — **P3 신규**
+
+**Request (부분 업데이트, 모든 필드 선택적):**
+```json
+{
+  "category": "WESTERN",
+  "difficulty": "HIGH",
+  "requiredTools": ["오븐", "핸드믹서"],
+  "price": 29000
+}
+```
+
+**처리:**
+1. `course.teacher.id !== req.user.id` → `403 Forbidden`
+2. 존재하지 않는 코스 → `404 Not Found`
+3. 제공된 필드만 선택적 업데이트 (`PATCH` 의미론)
+
+**Response 200:** `{ "statusCode": 200, "message": "강의가 수정되었습니다.", "data": null }`
 
 ---
 
@@ -359,6 +388,137 @@
 |---|---|---|---|
 | GET | `/user/me` | ✓ | 내 프로필 조회 |
 | PATCH | `/user/me` | ✓ | 프로필 수정 (nickname 등) |
+
+---
+
+## 알림 구독 API (`/subscriptions`) — **P3 신규**
+
+| Method | Endpoint | Auth | 설명 |
+|---|---|---|---|
+| GET | `/subscriptions` | ✓ | 내 구독 목록 조회 |
+| POST | `/subscriptions` | ✓ | 구독 등록 (이메일 또는 디스코드) |
+| PATCH | `/subscriptions/:id` | ✓ | 구독 설정 수정 (알림 종류 on/off) |
+| DELETE | `/subscriptions/:id` | ✓ | 구독 해지 |
+
+### POST `/subscriptions` — 구독 등록
+
+**Request:**
+```json
+{
+  "channel": "EMAIL",
+  "target": "user@example.com",
+  "newCourse": true,
+  "enrollmentComplete": true
+}
+```
+
+디스코드 구독 예시:
+```json
+{
+  "channel": "DISCORD",
+  "target": "https://discord.com/api/webhooks/xxx/yyy",
+  "newCourse": true,
+  "enrollmentComplete": false
+}
+```
+
+**에러:** `409` — 동일 채널+대상으로 이미 구독 중
+
+---
+
+## 모니터링 API — **P3 신규**
+
+| Method | Endpoint | Auth | 설명 |
+|---|---|---|---|
+| GET | `/health` | ✗ | 헬스체크 (DB·Redis 상태) |
+| GET | `/metrics` | ✗ | Prometheus 메트릭 스크레이핑 |
+
+### GET `/health` — 헬스체크
+
+`@nestjs/terminus` 기반. 응답 예시:
+```json
+{
+  "status": "ok",
+  "info": {
+    "database": { "status": "up" },
+    "redis": { "status": "up" }
+  },
+  "error": {},
+  "details": {
+    "database": { "status": "up" },
+    "redis": { "status": "up" }
+  }
+}
+```
+
+### GET `/metrics` — Prometheus 메트릭
+
+`prom-client` + `@willsoto/nestjs-prometheus` 기반. Prometheus 텍스트 형식으로 반환:
+- `http_requests_total` — 요청 수 (라벨: method, route, status)
+- `http_request_duration_seconds` — 응답 시간 히스토그램
+- `nodejs_heap_size_used_bytes` — 힙 메모리
+
+---
+
+## Discord Webhook 알림 — **P3 신규**
+
+Discord Webhook은 별도 엔드포인트 없이 서버 내부에서 직접 `axios.post(webhookUrl, payload)` 호출.
+
+**발송 시점:**
+- 신규 강의 등록 시 `channel: DISCORD` 구독자에게 즉시 발송
+- `@nestjs/schedule` 배치 크론 실행 후 결과 요약 발송
+
+**Payload 형식:**
+```json
+{
+  "username": "SolvingMeal Bot",
+  "embeds": [{
+    "title": "새 강의가 등록되었습니다!",
+    "description": "카테고리: 한식 | 난이도: 하 | 가격: 무료",
+    "color": 15158332
+  }]
+}
+```
+
+---
+
+## 토스페이먼츠 Webhook 수신 — **P3 신규**
+
+토스페이먼츠가 결제 상태 변경 시 우리 서버로 POST 요청을 보냅니다. 토스 대시보드에서 Webhook URL을 `<SERVER_URL>/api/v1/payments/webhook`으로 등록합니다.
+
+| Method | Endpoint | Auth | 설명 |
+|---|---|---|---|
+| POST | `/payments/webhook` | ✗ (시크릿 검증) | 토스페이먼츠 결제 상태 변경 수신 |
+
+### 수신 이벤트 유형
+
+| 이벤트 | 설명 |
+|---|---|
+| `PAYMENT_STATUS_CHANGED` | 결제 상태 변경 (PAID, CANCELLED 등) |
+| `REFUND_STATUS_CHANGED` | 환불 처리 상태 변경 |
+
+### 처리 흐름
+
+```
+1. Authorization 헤더에서 토스 시크릿 키 검증
+   → 불일치 시 401 Unauthorized 반환
+2. paymentKey로 DB에서 order 조회
+3. order.status 동기화 (중복 이벤트 멱등 처리)
+4. payment_logs 이벤트 기록
+5. 200 OK 반환 (실패 시 토스가 최대 5회 재전송)
+```
+
+> **멱등성(Idempotency) 필수:** 동일 `paymentKey`의 Webhook이 중복 수신될 수 있으므로, 이미 `PAID` 상태인 주문에 대한 중복 처리를 DB 체크로 방지해야 합니다.
+
+```typescript
+// payments.service.ts — Webhook 처리 예시
+async handleWebhook(paymentKey: string, status: string): Promise<void> {
+  const order = await this.orderRepo.findByPaymentKey(paymentKey);
+  if (!order || order.status === OrderStatus.PAID) return; // 멱등 처리
+  await this.orderRepo.updateStatus(order.id, status);
+  await this.paymentLogRepo.create({ order, eventType: status, ... });
+}
+```
 
 ---
 

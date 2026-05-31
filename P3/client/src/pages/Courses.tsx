@@ -1,4 +1,5 @@
-import { useState, useEffect, useCallback } from "react"
+import { useState, useEffect, useCallback, useRef } from "react"
+import axios from "axios"
 import { useSearchParams } from "react-router-dom"
 import { getCourses } from "../api/CourseApi"
 import type { GetCoursesParams } from "../types/course/GetCourseParams"
@@ -60,33 +61,39 @@ export default function Courses() {
     [category, difficulty, selectedTools, maxDuration],
   )
 
+  const abortRef = useRef<AbortController | null>(null)
+
   const fetchCourses = useCallback(
-    async (currentPage: number, reset: boolean, signal?: AbortSignal) => {
+    async (currentPage: number, reset: boolean) => {
+      abortRef.current?.abort()
+      const controller = new AbortController()
+      abortRef.current = controller
+
       setLoading(true)
       setError("")
       try {
-        const { data } = await getCourses(buildParams(currentPage), signal)
+        const { data } = await getCourses(buildParams(currentPage), controller.signal)
+        if (controller.signal.aborted) return
         const list: CourseListItem[] = Array.isArray(data)
           ? data
           : ((data as any)?.data ?? [])
         setCourses((prev) => (reset ? list : [...prev, ...list]))
         setHasMore(list.length === LIMIT)
       } catch (err: any) {
-        if (err?.name === "CanceledError" || err?.code === "ERR_CANCELED") return
-        setError("강의 목록을 불러오는 데 실패했습니다.")
+        if (axios.isCancel(err) || err?.name === "CanceledError" || err?.code === "ERR_CANCELED") return
+        if (!controller.signal.aborted) setError("강의 목록을 불러오는 데 실패했습니다.")
       } finally {
-        setLoading(false)
+        if (abortRef.current === controller) setLoading(false)
       }
     },
     [buildParams],
   )
 
   useEffect(() => {
-    const controller = new AbortController()
     setPage(1)
-    fetchCourses(1, true, controller.signal)
-    return () => controller.abort()
-  }, [category, difficulty, selectedTools, maxDuration])
+    fetchCourses(1, true)
+    return () => abortRef.current?.abort()
+  }, [category, difficulty, selectedTools, maxDuration, fetchCourses])
 
   useEffect(() => {
     const params: Record<string, string> = {}
@@ -104,7 +111,7 @@ export default function Courses() {
   const handleLoadMore = () => {
     const nextPage = page + 1
     setPage(nextPage)
-    fetchCourses(nextPage, false)
+    fetchCourses(nextPage, false)  // abortRef 패턴으로 이전 요청 자동 취소
   }
 
   const handleReset = () => {

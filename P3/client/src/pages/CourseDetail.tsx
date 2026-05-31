@@ -241,6 +241,7 @@ export default function CourseDetailPage() {
 
   const totalDuration = course.videos.reduce((acc, v) => acc + v.duration, 0)
   const isTeacher = user?.role === "teacher"
+  const isOwner = isTeacher && user?.id === course.teacher.id
   const avgRating = reviews.length > 0
     ? (reviews.reduce((s, r) => s + r.rating, 0) / reviews.length).toFixed(1)
     : null
@@ -413,10 +414,16 @@ export default function CourseDetailPage() {
               {enrollError && <p className={styles.enrollError}>{enrollError}</p>}
               {cartMsg && <p className={styles.cartMsg}>{cartMsg}</p>}
 
-              {isTeacher ? (
-                <button className={styles.addVideoBtn} onClick={() => navigate(`/videos/register/${id}`)}>
-                  + 영상 등록
-                </button>
+              {isOwner ? (
+                <div>
+                  <div className={styles.previewBadge}>👁 강사 미리보기 모드</div>
+                  <button className={styles.addVideoBtn} onClick={() => navigate(`/videos/register/${id}`)}>
+                    + 영상 등록
+                  </button>
+                  <button className={styles.editCourseBtn} onClick={() => navigate(`/teacher/edit/${id}`)}>
+                    ✏️ 강의 수정
+                  </button>
+                </div>
               ) : enrollSuccess ? (
                 <div className={styles.enrollDone}>✅ 수강 신청 완료!</div>
               ) : (

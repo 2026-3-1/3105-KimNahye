@@ -21,7 +21,7 @@ export class BookmarkRepository implements IBookmarkRepository {
   }
 
   async findById(id: string): Promise<Bookmark | null> {
-    return this.repo.findOne({ where: { id }, relations: ['user', 'video'] });
+    return this.repo.findOne({ where: { id }, relations: { user: true, video: true } });
   }
 
   async create(user: User, video: Video, positionSec: number, note?: string): Promise<Bookmark> {

@@ -16,7 +16,7 @@ export class CartRepository implements ICartRepository {
   async findAllByUser(user: User): Promise<CartItem[]> {
     return this.repo.find({
       where: { user: { id: user.id } },
-      relations: ['course', 'course.teacher', 'course.videos'],
+      relations: { course: { teacher: true, videos: true } },
       order: { addedAt: 'DESC' },
     });
   }

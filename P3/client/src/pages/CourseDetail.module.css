@@ -552,6 +552,40 @@
   background: var(--primary-dark);
 }
 
+.editCourseBtn {
+  display: block;
+  width: 100%;
+  margin-top: 8px;
+  padding: 12px;
+  background: #fff3e0;
+  color: #e67e22;
+  border: 1.5px solid #e67e22;
+  border-radius: var(--radius-sm);
+  font-size: 14px;
+  font-weight: 600;
+  font-family: inherit;
+  cursor: pointer;
+  transition: all var(--transition);
+}
+.editCourseBtn:hover {
+  background: #ffe0b2;
+}
+
+.previewBadge {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 8px 12px;
+  margin-bottom: 12px;
+  background: #eaf4ff;
+  border: 1px solid #90caf9;
+  border-radius: var(--radius-sm);
+  font-size: 13px;
+  font-weight: 600;
+  color: #1565c0;
+}
+
 /* ── 스켈레톤 ─────────────────────────────────────────────── */
 @keyframes shimmer {
   0% {

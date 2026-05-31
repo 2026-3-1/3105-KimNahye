@@ -9,9 +9,14 @@ services:
     restart: always
     env_file:
       - .env
+    environment:
+      DATABASE_URL: postgresql://postgres:1234@postgresql:5432/solving_meal
+      REDIS_URL: redis://redis:6379
     depends_on:
-      - redis
-      - postgresql
+      postgresql:
+        condition: service_healthy
+      redis:
+        condition: service_started
     networks:
       - app-network
 
@@ -20,28 +25,35 @@ services:
     container_name: frontend
     restart: always
     ports:
-      - "3000:3000"
+      - "80:80"
     depends_on:
       - nestjs
     networks:
       - app-network
 
   redis:
-    image: redis:8.6
+    image: redis:7-alpine
     container_name: redis
     restart: always
+    command: redis-server --maxmemory 256mb --maxmemory-policy allkeys-lru
     networks:
       - app-network
 
   postgresql:
-    image: postgres:18
+    image: postgres:16-alpine
     container_name: postgresql
     restart: always
     environment:
+      POSTGRES_USER: postgres
       POSTGRES_PASSWORD: 1234
-      POSTGRES_DB: solving-meal
+      POSTGRES_DB: solving_meal
     volumes:
-      - postgres_data:/var/lib/postgresql
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
     networks:
       - app-network
 

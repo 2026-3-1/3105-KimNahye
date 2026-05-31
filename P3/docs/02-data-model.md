@@ -521,3 +521,85 @@ export class Bookmark {
 | User 1:N VideoWatchLog | 영상별 시청 위치 이력 |
 | User 1:N Review | 수강 완료(80%) 후 리뷰 |
 | User 1:N Bookmark | 영상 특정 시점 북마크 |
+| User 1:N Subscription | 알림 구독 (이메일/디스코드) |
+
+---
+
+### 13. `subscriptions` (알림 구독) — **P3 신규**
+
+```typescript
+@Entity('subscriptions')
+export class Subscription {
+  @PrimaryGeneratedColumn('uuid')
+  id: string;
+
+  @ManyToOne(() => User, { nullable: false, onDelete: 'CASCADE' })
+  user: User;
+
+  // EMAIL | DISCORD
+  @Column({ type: 'enum', enum: NotificationChannel })
+  channel: NotificationChannel;
+
+  // 이메일 주소 또는 Discord Webhook URL
+  @Column({ type: 'text' })
+  target: string;
+
+  // 신규 강의 알림 구독 여부
+  @Column({ name: 'new_course', type: 'boolean', default: true })
+  newCourse: boolean;
+
+  // 수강 완료 알림 구독 여부
+  @Column({ name: 'enrollment_complete', type: 'boolean', default: true })
+  enrollmentComplete: boolean;
+
+  @Column({ name: 'is_active', type: 'boolean', default: true })
+  isActive: boolean;
+
+  @CreateDateColumn({ name: 'created_at' })
+  createdAt: Date;
+}
+```
+
+**NotificationChannel enum**
+
+| 값 | 설명 |
+|---|---|
+| `EMAIL` | Nodemailer를 통한 이메일 발송 |
+| `DISCORD` | Discord Webhook HTTP POST |
+
+---
+
+### 14. `notification_logs` (알림 발송 이력) — **P3 신규**
+
+```typescript
+@Entity('notification_logs')
+export class NotificationLog {
+  @PrimaryGeneratedColumn('uuid')
+  id: string;
+
+  @ManyToOne(() => User, { nullable: true })
+  user: User;
+
+  @Column({ type: 'enum', enum: NotificationChannel })
+  channel: NotificationChannel;
+
+  // NEW_COURSE | ENROLLMENT_COMPLETE | SCHEDULER_BATCH
+  @Column({ name: 'event_type', type: 'varchar', length: 50 })
+  eventType: string;
+
+  @Column({ type: 'text' })
+  payload: string;       // 발송 내용 요약
+
+  // SUCCESS | FAILED
+  @Column({ type: 'varchar', length: 20 })
+  status: string;
+
+  @Column({ name: 'error_message', type: 'text', nullable: true })
+  errorMessage: string;
+
+  @CreateDateColumn({ name: 'created_at' })
+  createdAt: Date;
+}
+```
+
+> **스케쥴러 연동:** `@nestjs/schedule` 크론 잡이 매일 오전 9시 `newCourse` 구독자에게 신규 강의 목록을 일괄 발송하고, 발송 결과를 `notification_logs`에 기록합니다.

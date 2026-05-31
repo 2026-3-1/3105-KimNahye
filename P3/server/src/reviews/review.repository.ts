@@ -16,7 +16,7 @@ export class ReviewRepository implements IReviewRepository {
   async findByCourse(courseId: string): Promise<Review[]> {
     return this.repo.find({
       where: { course: { id: courseId } },
-      relations: ['user'],
+      relations: { user: true },
       order: { createdAt: 'DESC' },
     });
   }
@@ -28,7 +28,7 @@ export class ReviewRepository implements IReviewRepository {
   }
 
   async findById(id: string): Promise<Review | null> {
-    return this.repo.findOne({ where: { id }, relations: ['user'] });
+    return this.repo.findOne({ where: { id }, relations: { user: true } });
   }
 
   async create(user: User, course: Course, rating: number, content: string): Promise<Review> {
@@ -38,7 +38,7 @@ export class ReviewRepository implements IReviewRepository {
 
   async update(id: string, rating: number, content: string): Promise<Review> {
     await this.repo.update(id, { rating, content });
-    return this.repo.findOne({ where: { id }, relations: ['user'] }) as Promise<Review>;
+    return this.repo.findOne({ where: { id }, relations: { user: true } }) as Promise<Review>;
   }
 
   async delete(id: string): Promise<void> {

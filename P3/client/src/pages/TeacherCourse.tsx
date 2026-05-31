@@ -118,22 +118,22 @@ export default function TeacherCourses() {
                   </div>
                   <div className={cardStyles.actions}>
                     <button
-                      className={cardStyles.previewBtn}
-                      onClick={() => navigate(`/courses/${course.id}`)}
-                    >
-                      미리보기
-                    </button>
-                    <button
                       className={cardStyles.editBtn}
                       onClick={() => navigate(`/teacher/edit/${course.id}`)}
                     >
-                      수정
+                      ✏️ 수정
+                    </button>
+                    <button
+                      className={cardStyles.previewBtn}
+                      onClick={() => navigate(`/courses/${course.id}`)}
+                    >
+                      👁 미리보기
                     </button>
                     <button
                       className={cardStyles.videoBtn}
                       onClick={() => navigate(`/videos/register/${course.id}`)}
                     >
-                      + 영상 등록
+                      + 영상
                     </button>
                   </div>
                 </div>

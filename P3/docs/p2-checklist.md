@@ -134,7 +134,7 @@
 
 ## 미구현 항목 (Phase 7 — 결제)
 
-> 토스페이먼츠 실제 SDK 연동이 필요하여 이번 구현에서 제외
+> 토스페이먼츠 실제 SDK 연동이 필요하여 P2에서 제외 → **P3에서 구현 예정**
 
 - [ ] `Order` / `OrderItem` / `PaymentLog` 엔티티
 - [ ] `POST /payments/prepare` — 주문 생성
@@ -144,3 +144,47 @@
 - [ ] `Cart.tsx`에서 토스 결제창 연동
 - [ ] `PaymentSuccess.tsx` / `PaymentFail.tsx` 페이지
 - [ ] `OrderHistory.tsx` 페이지
+
+---
+
+## P3 버그 수정 ✅ 완료
+
+> P2 코드베이스를 P3로 복사한 후 적용된 수정 사항
+
+### 백엔드
+
+- [x] **토큰 재발급 경쟁 조건 해결** (`src/api/ApiClient.ts`)
+  - 동시에 여러 401 응답이 오면 각각 refresh 시도 → RTR 방식에서 두 번째 요청부터 실패하는 문제
+  - `refreshPromise` 뮤텍스 패턴으로 모든 401 요청이 동일한 refresh Promise를 공유하도록 수정
+
+- [x] **선생님 본인 강의 영상 미리보기 허용** (`src/videos/video.service.ts`)
+  - `getVideoDetail` 에서 수강 여부만 체크하여 선생님이 자신의 강의 영상을 볼 수 없던 문제
+  - `isOwner = user.role === TEACHER && course.teacher.id === user.id` 체크 추가, owner는 수강 검증 건너뜀
+
+- [x] **코스 수정 API 추가** (`src/teacher/teacher.controller.ts`, `teacher.service.ts`, `courses/course.service.ts`)
+  - `PATCH /teacher/:id` 엔드포인트 추가
+  - `UpdateCourseRequest` DTO 생성 (category, difficulty, requiredTools, price 선택적)
+  - 본인 코스 아닐 경우 `403 Forbidden` 반환
+
+### 프론트엔드
+
+- [x] **Navbar "내 강의" 메뉴 TEACHER 숨김** (`src/components/layout/Navbar.tsx`)
+  - TEACHER 로그인 시 학생 전용인 "내 강의" 링크가 노출되던 문제
+  - `user?.role !== 'teacher'` 조건 추가
+
+- [x] **무료 강의 장바구니 경유 강제** (`src/pages/CourseDetail.tsx`)
+  - `price === 0`일 때 `enrollCourse()` 직접 호출하는 분기 제거
+  - 모든 강의(무료·유료 모두) 장바구니 → 결제(0원 포함) 플로우로 통일
+
+- [x] **코스 목록 AbortController 적용** (`src/pages/Courses.tsx`)
+  - 빠른 탭 전환 시 이전 요청이 완료되어 상태를 덮어쓰는 문제
+  - `useEffect` cleanup에서 `controller.abort()` 호출, `CanceledError` 무시 처리
+
+- [x] **TeacherCourse 미리보기/수정/영상 등록 버튼** (`src/pages/TeacherCourse.tsx`)
+  - 선생님 코스 관리 페이지에 미리보기(`/courses/:id`), 수정(`/teacher/edit/:id`), 영상 등록 버튼 추가
+
+- [x] **EditCourse 페이지 신규 추가** (`src/pages/EditCourse.tsx`)
+  - 기존 코스 정보를 불러와 수정 폼에 pre-fill
+  - `updateCourse(id, {...})` 호출 후 `/teacher` 이동
+
+- [x] **App.tsx 에 `/teacher/edit/:id` 라우트 추가**

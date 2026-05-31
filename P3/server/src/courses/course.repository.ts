@@ -17,7 +17,7 @@ export class CourseRepository implements ICourseRepository {
   async findByTeacher(teacher: User): Promise<Course[] | null> {
     const result = await this.repo.find({
       where: { teacher: { id: teacher.id } },
-      relations: ['teacher', 'videos'],
+      relations: { teacher: true, videos: true },
     });
 
     return result.length > 0 ? result : null;

@@ -103,7 +103,7 @@ export class VideoService {
       );
     }
 
-    const video = this.videoRepository.create(
+    const video = await this.videoRepository.create(
       createVideoDto.youtubeVideoId,
       createVideoDto.title,
       createVideoDto.duration,
