@@ -17,6 +17,8 @@ import CreateCourse from "./pages/CreateCourse"
 import EditCourse from "./pages/EditCourse"
 import RegisterVideo from "./pages/RegisterVideo"
 import TeacherCourses from "./pages/TeacherCourse"
+import PaymentSuccess from "./pages/PaymentSuccess"
+import PaymentFail from "./pages/PaymentFail"
 
 export default function App() {
   const { isAuthenticated, setUser } = useAuthStore()
@@ -52,6 +54,10 @@ export default function App() {
         <Route path="/teacher" element={<ProtectedRoute role="teacher"><TeacherCourses /></ProtectedRoute>} />
         <Route path="/teacher/edit/:id" element={<ProtectedRoute role="teacher"><EditCourse /></ProtectedRoute>} />
         <Route path="/videos/register/:courseId" element={<ProtectedRoute role="teacher"><RegisterVideo /></ProtectedRoute>} />
+
+        {/* 결제 */}
+        <Route path="/payment/success" element={<ProtectedRoute><PaymentSuccess /></ProtectedRoute>} />
+        <Route path="/payment/fail" element={<PaymentFail />} />
       </Routes>
     </BrowserRouter>
   )

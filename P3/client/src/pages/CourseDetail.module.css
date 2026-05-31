@@ -383,6 +383,52 @@
   cursor: not-allowed;
 }
 
+.payBtn {
+  display: block;
+  width: calc(100% - 48px);
+  margin: 0 24px 8px;
+  padding: 12px;
+  background: var(--primary);
+  color: #fff;
+  border: none;
+  border-radius: var(--radius-sm);
+  font-size: 15px;
+  font-weight: 700;
+  font-family: inherit;
+  cursor: pointer;
+  transition: opacity var(--transition);
+}
+.payBtn:hover:not(:disabled) {
+  opacity: 0.88;
+}
+.payBtn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.enrollBtn {
+  display: block;
+  width: calc(100% - 48px);
+  margin: 0 24px 12px;
+  padding: 12px;
+  background: var(--primary);
+  color: #fff;
+  border: none;
+  border-radius: var(--radius-sm);
+  font-size: 15px;
+  font-weight: 700;
+  font-family: inherit;
+  cursor: pointer;
+  transition: opacity var(--transition);
+}
+.enrollBtn:hover:not(:disabled) {
+  opacity: 0.88;
+}
+.enrollBtn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
 .cartMsg {
   margin: 0 24px 8px;
   font-size: 13px;

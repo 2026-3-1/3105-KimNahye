@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react"
 import { useParams, useNavigate } from "react-router-dom"
+import { loadTossPayments, ANONYMOUS } from "@tosspayments/tosspayments-sdk"
 import { getCourse } from "../api/CourseApi"
 import { enrollCourse } from "../api/EnrollmentApi"
 import { addToCart } from "../api/CartApi"
@@ -69,6 +70,7 @@ export default function CourseDetailPage() {
   const [activeVideo, setActiveVideo] = useState<number>(0)
   const [cartAdding, setCartAdding] = useState(false)
   const [cartMsg, setCartMsg] = useState("")
+  const [paying, setPaying] = useState(false)
 
   const [reviews, setReviews] = useState<Review[]>([])
   const [reviewRating, setReviewRating] = useState(5)
@@ -139,6 +141,30 @@ export default function CourseDetailPage() {
       setCartMsg(axiosError.response?.data?.message ?? "장바구니 추가 실패")
     } finally {
       setCartAdding(false)
+    }
+  }
+
+  const handlePayment = async () => {
+    if (!isAuthenticated) { navigate("/login"); return }
+    if (!id || !course) return
+    setPaying(true)
+    try {
+      const clientKey = import.meta.env.VITE_TOSS_CLIENT_KEY as string
+      const tossPayments = await loadTossPayments(clientKey)
+      const payment = tossPayments.payment({ customerKey: user?.id ?? ANONYMOUS })
+      sessionStorage.setItem("pendingCourseId", id)
+      await payment.requestPayment({
+        method: "CARD",
+        amount: { currency: "KRW", value: course.price },
+        orderId: `${id}_${Date.now()}`,
+        orderName: `${course.teacher.name} 셰프의 ${course.category} 클래스`,
+        successUrl: `${window.location.origin}/payment/success`,
+        failUrl: `${window.location.origin}/payment/fail`,
+      })
+    } catch {
+      sessionStorage.removeItem("pendingCourseId")
+    } finally {
+      setPaying(false)
     }
   }
 
@@ -427,14 +453,24 @@ export default function CourseDetailPage() {
               ) : enrollSuccess ? (
                 <div className={styles.enrollDone}>✅ 수강 신청 완료!</div>
               ) : (
-                /* 모든 강의(무료 포함): 장바구니 → 결제 루틴 */
                 <>
                   <div className={styles.priceTag}>
                     {course.price === 0 ? "무료" : `${course.price.toLocaleString()}원`}
                   </div>
-                  <button className={styles.cartBtn} onClick={handleAddToCart} disabled={cartAdding}>
-                    {cartAdding ? "담는 중..." : "🛒 장바구니 담기"}
-                  </button>
+                  {course.price === 0 ? (
+                    <button className={styles.enrollBtn} onClick={handleEnroll} disabled={enrolling}>
+                      {enrolling ? "신청 중..." : "무료 수강신청"}
+                    </button>
+                  ) : (
+                    <>
+                      <button className={styles.payBtn} onClick={handlePayment} disabled={paying}>
+                        {paying ? "결제 중..." : "💳 결제하기"}
+                      </button>
+                      <button className={styles.cartBtn} onClick={handleAddToCart} disabled={cartAdding}>
+                        {cartAdding ? "담는 중..." : "🛒 장바구니 담기"}
+                      </button>
+                    </>
+                  )}
                 </>
               )}
 
