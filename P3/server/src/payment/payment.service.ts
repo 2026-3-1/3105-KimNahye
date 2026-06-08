@@ -2,21 +2,28 @@ import {
   BadRequestException,
   ConflictException,
   Injectable,
+  Logger,
   NotFoundException,
+  UnauthorizedException,
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import axios from 'axios';
+import * as crypto from 'crypto';
 import { EnrollmentService } from 'src/enrollments/enrollment.service';
 import { UserService } from 'src/user/user.service';
 import { CourseService } from 'src/courses/course.service';
 import { MailService } from 'src/mail/mail.service';
 import { ConfirmPaymentDto } from './dto/confirm-payment.dto';
 import { Payment } from './entities/payment.entity';
+import { WebhookEventDto } from './dto/webhook-event.dto';
+import { withRetry } from 'src/common/utils/retry.util';
 
 @Injectable()
 export class PaymentService {
+  private readonly logger = new Logger(PaymentService.name);
+
   constructor(
     private readonly configService: ConfigService,
     private readonly enrollmentService: EnrollmentService,
@@ -51,15 +58,17 @@ export class PaymentService {
 
     let paymentData: any;
     try {
-      const { data } = await axios.post(
-        'https://api.tosspayments.com/v1/payments/confirm',
-        { paymentKey: dto.paymentKey, orderId: dto.orderId, amount: course.price },
-        {
-          headers: {
-            Authorization: `Basic ${encoded}`,
-            'Content-Type': 'application/json',
+      const { data } = await withRetry(() =>
+        axios.post(
+          'https://api.tosspayments.com/v1/payments/confirm',
+          { paymentKey: dto.paymentKey, orderId: dto.orderId, amount: course.price },
+          {
+            headers: {
+              Authorization: `Basic ${encoded}`,
+              'Content-Type': 'application/json',
+            },
           },
-        },
+        ),
       );
       paymentData = data;
     } catch (err: any) {
@@ -91,5 +100,38 @@ export class PaymentService {
     }
 
     return enrollment;
+  }
+
+  async handleWebhook(signature: string | undefined, body: WebhookEventDto): Promise<void> {
+    // 1. 시그니처 검증
+    const secret = this.configService.get<string>('TOSS_WEBHOOK_SECRET');
+    if (secret) {
+      const expected = crypto
+        .createHmac('sha256', secret)
+        .update(JSON.stringify(body))
+        .digest('base64');
+      if (signature !== expected) {
+        throw new UnauthorizedException('유효하지 않은 웹훅 시그니처입니다.');
+      }
+    }
+
+    // 2. 이벤트 타입 처리
+    if (body.eventType === 'PAYMENT_STATUS_CHANGED') {
+      const { paymentKey, status } = body.data;
+
+      if (status === 'CANCELED') {
+        const payment = await this.paymentRepository.findOne({
+          where: { paymentKey },
+        });
+        if (payment) {
+          await this.paymentRepository.remove(payment);
+          this.logger.log(`결제 취소 처리 완료: paymentKey=${paymentKey}`);
+        } else {
+          this.logger.warn(`취소할 결제 레코드를 찾을 수 없음: paymentKey=${paymentKey}`);
+        }
+      }
+    } else {
+      this.logger.log(`지원하지 않는 웹훅 이벤트: ${body.eventType}`);
+    }
   }
 }
