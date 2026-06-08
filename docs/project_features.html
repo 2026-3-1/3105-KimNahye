@@ -1,0 +1,729 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>2026년 3학년 1학기 프로젝트 실습 — 단계별 구현 기능 정리</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&family=IBM+Plex+Mono:wght@400;500&display=swap');
+
+  :root {
+    --p1: #1a4f8a;
+    --p2: #1a6644;
+    --p3: #7a3b00;
+    --p1-bg: #eaf1fb;
+    --p2-bg: #e8f5ee;
+    --p3-bg: #fdf3e7;
+    --border: #d0d5dd;
+    --text: #1a1a2e;
+    --muted: #555;
+    --tag-backend: #dbeafe;
+    --tag-front: #fce7f3;
+    --tag-security: #fef3c7;
+    --tag-ops: #d1fae5;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Noto Sans KR', sans-serif;
+    font-size: 13px;
+    color: var(--text);
+    background: #f8f9fb;
+    padding: 32px;
+    line-height: 1.6;
+  }
+
+  /* ── 헤더 ── */
+  header {
+    background: var(--text);
+    color: #fff;
+    padding: 28px 36px;
+    border-radius: 8px;
+    margin-bottom: 28px;
+  }
+  header h1 { font-size: 20px; font-weight: 700; letter-spacing: -0.3px; }
+  header p  { font-size: 12px; color: #aab; margin-top: 6px; }
+  header .badges { margin-top: 14px; display: flex; gap: 8px; flex-wrap: wrap; }
+  .badge {
+    font-size: 11px; font-family: 'IBM Plex Mono', monospace;
+    padding: 3px 10px; border-radius: 20px; font-weight: 500;
+  }
+  .b-p1 { background: var(--p1-bg); color: var(--p1); }
+  .b-p2 { background: var(--p2-bg); color: var(--p2); }
+  .b-p3 { background: var(--p3-bg); color: var(--p3); }
+
+  /* ── 범례 ── */
+  .legend {
+    display: flex; gap: 14px; flex-wrap: wrap;
+    margin-bottom: 20px; padding: 12px 16px;
+    background: #fff; border: 1px solid var(--border);
+    border-radius: 6px; font-size: 12px;
+  }
+  .legend-item { display: flex; align-items: center; gap: 5px; }
+  .dot { width: 10px; height: 10px; border-radius: 2px; display: inline-block; }
+  .d-backend  { background: #93c5fd; }
+  .d-front    { background: #f9a8d4; }
+  .d-security { background: #fcd34d; }
+  .d-ops      { background: #6ee7b7; }
+
+  /* ── 섹션 ── */
+  .section { margin-bottom: 32px; }
+  .section-header {
+    display: flex; align-items: center; gap: 12px;
+    padding: 12px 18px;
+    border-radius: 6px 6px 0 0;
+    border: 1px solid var(--border);
+    border-bottom: none;
+  }
+  .section-header.p1 { background: var(--p1-bg); border-color: var(--p1); }
+  .section-header.p2 { background: var(--p2-bg); border-color: var(--p2); }
+  .section-header.p3 { background: var(--p3-bg); border-color: var(--p3); }
+  .phase-label {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 15px; font-weight: 700; min-width: 32px;
+  }
+  .p1 .phase-label { color: var(--p1); }
+  .p2 .phase-label { color: var(--p2); }
+  .p3 .phase-label { color: var(--p3); }
+  .phase-title { font-size: 14px; font-weight: 700; }
+  .phase-period {
+    margin-left: auto; font-size: 11px; font-family: 'IBM Plex Mono', monospace;
+    color: var(--muted);
+  }
+
+  /* ── 테이블 ── */
+  table {
+    width: 100%; border-collapse: collapse;
+    background: #fff;
+    border: 1px solid var(--border);
+    border-radius: 0 0 6px 6px;
+  }
+  thead tr { background: #f2f4f7; }
+  thead th {
+    padding: 9px 14px;
+    text-align: left; font-size: 11px; font-weight: 600;
+    color: var(--muted); text-transform: uppercase;
+    letter-spacing: 0.5px;
+    border-bottom: 1px solid var(--border);
+  }
+  tbody tr { border-bottom: 1px solid #eef0f3; }
+  tbody tr:last-child { border-bottom: none; }
+  tbody tr:hover { background: #fafbfc; }
+  td { padding: 9px 14px; vertical-align: top; }
+  td:first-child { font-weight: 500; white-space: nowrap; min-width: 80px; }
+
+  /* ── 태그 ── */
+  .tag {
+    display: inline-block; font-size: 10px; font-weight: 600;
+    padding: 2px 7px; border-radius: 3px;
+    font-family: 'IBM Plex Mono', monospace; white-space: nowrap;
+  }
+  .tag.backend  { background: var(--tag-backend);  color: #1e40af; }
+  .tag.front    { background: var(--tag-front);    color: #9d174d; }
+  .tag.security { background: var(--tag-security); color: #92400e; }
+  .tag.ops      { background: var(--tag-ops);      color: #065f46; }
+  .tag.all      { background: #e8e8f0;             color: #3c3c6e; }
+
+  /* ── 기능 목록 ── */
+  .feature-list { list-style: none; padding: 0; }
+  .feature-list li {
+    padding: 2px 0; font-size: 12.5px;
+    display: flex; align-items: flex-start; gap: 6px;
+  }
+  .feature-list li::before {
+    content: '·'; color: #aaa; flex-shrink: 0; margin-top: 1px;
+  }
+
+  /* ── 산출물 ── */
+  .deliverable {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px; color: #444;
+    background: #f5f5f5; border-radius: 3px;
+    padding: 1px 5px; display: inline-block; margin: 1px 2px 1px 0;
+  }
+
+  /* ── 인쇄 ── */
+  @media print {
+    body { padding: 16px; background: #fff; }
+    .section { break-inside: avoid; }
+    header { background: #1a1a2e !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    .section-header { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    thead tr { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>2026년 3학년 1학기 프로젝트 실습 — 단계별 구현 기능 정리</h1>
+  <p>기획-설계-개발-테스트-배포-운영-개선 전 과정 | 인강사이트 프로젝트</p>
+  <div class="badges">
+    <span class="badge b-p1">P1 · 기초/개인서비스 (학생용)</span>
+    <span class="badge b-p2">P2 · 실전형/인증+권한 (선생님용)</span>
+    <span class="badge b-p3">P3 · 운영형/외부연동+관측성</span>
+  </div>
+</header>
+
+<div class="legend">
+  <strong style="font-size:11px;margin-right:4px;">분야 범례</strong>
+  <span class="legend-item"><span class="dot d-backend"></span>백엔드</span>
+  <span class="legend-item"><span class="dot d-front"></span>프론트</span>
+  <span class="legend-item"><span class="dot d-security"></span>보안</span>
+  <span class="legend-item"><span class="dot d-ops"></span>운영/CI·CD</span>
+</div>
+
+
+<!-- ══════════════════════════════
+     P1
+══════════════════════════════ -->
+<div class="section">
+  <div class="section-header p1">
+    <span class="phase-label">P1</span>
+    <span class="phase-title">기초/개인서비스 — 인증 없이 백엔드·프론트·CRUD·DBMS 구현</span>
+    <span class="phase-period">1~4주차 → 발표 4/3</span>
+  </div>
+  <table>
+    <thead>
+      <tr>
+        <th style="width:90px">분야</th>
+        <th style="width:160px">카테고리</th>
+        <th>구현 기능</th>
+        <th style="width:220px">주요 산출물</th>
+      </tr>
+    </thead>
+    <tbody>
+
+      <!-- 설계 -->
+      <tr>
+        <td><span class="tag all">설계</span></td>
+        <td>기획·요구사항</td>
+        <td>
+          <ul class="feature-list">
+            <li>사용자 시나리오 작성 및 유저 스토리 + 수용 기준(AC) 정의</li>
+            <li>MVP 범위 정의 (포함/제외 기능 명확화)</li>
+            <li>주차별 마일스톤 계획 수립</li>
+            <li>ERD 설계 및 주요 테이블 정의</li>
+            <li>아키텍처 다이어그램 (컴포넌트/데이터흐름)</li>
+            <li>프론트 와이어프레임 (페이지 흐름)</li>
+            <li>테스트 계획 수립 (유닛/통합/e2e 최소 세트)</li>
+          </ul>
+        </td>
+        <td>
+          <span class="deliverable">docs/p1/requirements.md</span>
+          <span class="deliverable">docs/p1/api-draft.yaml</span>
+          <span class="deliverable">docs/p1/erd.md</span>
+          <span class="deliverable">docs/p1/architecture.md</span>
+          <span class="deliverable">docs/p1/test-plan.md</span>
+        </td>
+      </tr>
+
+      <!-- 백엔드 -->
+      <tr>
+        <td><span class="tag backend">백엔드</span></td>
+        <td>API 서버</td>
+        <td>
+          <ul class="feature-list">
+            <li>인강 콘텐츠 기본 CRUD API 구현 (강의 목록/상세/등록/수정/삭제)</li>
+            <li>입력 유효성 검증 (Validation)</li>
+            <li>예외 처리 표준화 (에러 코드/응답 규격 통일)</li>
+            <li>OpenAPI 명세 작성 및 최신화 (openapi.yaml)</li>
+            <li>DB 마이그레이션 도구 적용 (Flyway / Prisma / TypeORM 중 선택)</li>
+          </ul>
+        </td>
+        <td>
+          <span class="deliverable">백엔드 코드</span>
+          <span class="deliverable">openapi.yaml</span>
+          <span class="deliverable">docs/p1/error-codes.md</span>
+        </td>
+      </tr>
+
+      <!-- DB -->
+      <tr>
+        <td><span class="tag backend">백엔드</span></td>
+        <td>데이터베이스</td>
+        <td>
+          <ul class="feature-list">
+            <li>DBMS 선정 및 연결 (MySQL / PostgreSQL — 인메모리 불가)</li>
+            <li>스키마 설계 및 마이그레이션 스크립트 작성</li>
+            <li>기본 인덱스 적용</li>
+          </ul>
+        </td>
+        <td>
+          <span class="deliverable">migration scripts</span>
+        </td>
+      </tr>
+
+      <!-- 프론트 -->
+      <tr>
+        <td><span class="tag front">프론트</span></td>
+        <td>화면 구현</td>
+        <td>
+          <ul class="feature-list">
+            <li>모바일 우선 반응형 UI 구현 (웹/앱 선택)</li>
+            <li>강의 목록·상세·등록·수정·삭제 화면</li>
+            <li>라우팅 설정</li>
+            <li>상태 관리 및 폼 처리</li>
+            <li>API 클라이언트 모듈화 (axios / fetch wrapper)</li>
+          </ul>
+        </td>
+        <td>
+          <span class="deliverable">프론트 코드</span>
+          <span class="deliverable">docs/p1/ui-flow.md</span>
+        </td>
+      </tr>
+
+      <!-- 품질 -->
+      <tr>
+        <td><span class="tag ops">CI/CD</span></td>
+        <td>품질·CI</td>
+        <td>
+          <ul class="feature-list">
+            <li>백엔드 유닛/통합 테스트 최소 1~2개 작성</li>
+            <li>프론트 테스트 최소 1~2개 작성</li>
+            <li>린트·포맷 설정</li>
+            <li>GitHub Actions CI 파이프라인 구성 (build / test / lint)</li>
+            <li>Git 브랜치 전략 (GitHub Flow) 및 커밋 규칙 (Conventional Commits) 적용</li>
+            <li>이슈/PR 템플릿 설정</li>
+            <li>Definition of Done (DoD) 정의</li>
+          </ul>
+        </td>
+        <td>
+          <span class="deliverable">.github/workflows/ci.yml</span>
+          <span class="deliverable">docs/p1/ci.md</span>
+          <span class="deliverable">README.md</span>
+          <span class="deliverable">docs/ai-usage.md</span>
+        </td>
+      </tr>
+
+      <!-- 운영 -->
+      <tr>
+        <td><span class="tag ops">운영</span></td>
+        <td>배포·운영</td>
+        <td>
+          <ul class="feature-list">
+            <li>Dockerfile 및 Docker Compose 작성 (dev/prod 환경 분리)</li>
+            <li>환경 변수 분리 관리</li>
+            <li>헬스체크 엔드포인트 구현</li>
+            <li>구조화 로그 설정</li>
+            <li>CD 워크플로우 구성 (GitHub Actions)</li>
+            <li>배포 전략 수립 (Rolling / 단순 재배포)</li>
+            <li>롤백 절차 및 장애 대응 가이드 작성</li>
+          </ul>
+        </td>
+        <td>
+          <span class="deliverable">docker-compose.yml</span>
+          <span class="deliverable">.github/workflows/cd.yml</span>
+          <span class="deliverable">docs/p1/runbook.md</span>
+        </td>
+      </tr>
+
+    </tbody>
+  </table>
+</div>
+
+
+<!-- ══════════════════════════════
+     P2
+══════════════════════════════ -->
+<div class="section">
+  <div class="section-header p2">
+    <span class="phase-label">P2</span>
+    <span class="phase-title">실전형/인증+권한 — JWT 인증 및 역할 기반 접근 제어</span>
+    <span class="phase-period">5~10주차 → 발표 5/8</span>
+  </div>
+  <table>
+    <thead>
+      <tr>
+        <th style="width:90px">분야</th>
+        <th style="width:160px">카테고리</th>
+        <th>구현 기능</th>
+        <th style="width:220px">주요 산출물</th>
+      </tr>
+    </thead>
+    <tbody>
+
+      <!-- 설계 -->
+      <tr>
+        <td><span class="tag all">설계</span></td>
+        <td>P2 설계</td>
+        <td>
+          <ul class="feature-list">
+            <li>P2 요구사항 도출 (유저 스토리 + 수용 기준)</li>
+            <li>Role / Permission 모델 설계 (관리자·판매자·고객)</li>
+            <li>토큰 만료 및 갱신 전략 설계 (Refresh Token)</li>
+            <li>OWASP Top 10 기반 보안 체크리스트 작성</li>
+            <li>간단 위협 모델 (STRIDE) 작성</li>
+            <li>P2 ERD 및 OpenAPI 확정</li>
+          </ul>
+        </td>
+        <td>
+          <span class="deliverable">docs/p2/requirements.md</span>
+          <span class="deliverable">docs/p2/security-outline.md</span>
+          <span class="deliverable">docs/p2/threat-model.md</span>
+          <span class="deliverable">docs/p2/erd.md</span>
+          <span class="deliverable">docs/p2/openapi.yaml</span>
+        </td>
+      </tr>
+
+      <!-- 백엔드 인증 -->
+      <tr>
+        <td><span class="tag backend">백엔드</span></td>
+        <td>인증</td>
+        <td>
+          <ul class="feature-list">
+            <li>회원가입 API (이메일/비밀번호)</li>
+            <li>로그인 API + JWT Access Token 발급</li>
+            <li>Refresh Token 발급 및 갱신</li>
+            <li>로그아웃 (토큰 무효화)</li>
+            <li>비밀번호 암호화 (bcrypt 등)</li>
+          </ul>
+        </td>
+        <td>
+          <span class="deliverable">백엔드 코드</span>
+          <span class="deliverable">docs/p2/auth-spec.md</span>
+        </td>
+      </tr>
+
+      <!-- 백엔드 권한 -->
+      <tr>
+        <td><span class="tag backend">백엔드</span></td>
+        <td>권한 제어</td>
+        <td>
+          <ul class="feature-list">
+            <li>RBAC 미들웨어 / 필터 구현 (관리자·판매자·고객 역할 분리)</li>
+            <li>역할별 API 접근 제어 (Guard / Interceptor)</li>
+            <li>토큰 검증 미들웨어</li>
+          </ul>
+        </td>
+        <td>
+          <span class="deliverable">백엔드 코드</span>
+        </td>
+      </tr>
+
+      <!-- 보안 -->
+      <tr>
+        <td><span class="tag security">보안</span></td>
+        <td>보안 강화</td>
+        <td>
+          <ul class="feature-list">
+            <li>SQL Injection 방어 (Prepared Statement / ORM 파라미터 바인딩)</li>
+            <li>XSS 방어 (입력 이스케이프 / CSP 헤더)</li>
+            <li>CORS 설정</li>
+            <li>민감 정보 환경변수 분리 (Secrets 관리)</li>
+            <li>OWASP Top 10 핵심 항목 점검 및 조치</li>
+          </ul>
+        </td>
+        <td>
+          <span class="deliverable">docs/p2/security-outline.md</span>
+        </td>
+      </tr>
+
+      <!-- 프론트 -->
+      <tr>
+        <td><span class="tag front">프론트</span></td>
+        <td>인증 UI</td>
+        <td>
+          <ul class="feature-list">
+            <li>로그인 / 회원가입 화면</li>
+            <li>로그인 상태 관리 (토큰 저장·갱신·만료 처리)</li>
+            <li>보호 라우트 (Protected Route) 구현</li>
+            <li>역할별 메뉴·화면 분기 처리</li>
+          </ul>
+        </td>
+        <td>
+          <span class="deliverable">프론트 코드</span>
+        </td>
+      </tr>
+
+      <!-- e2e 테스트 -->
+      <tr>
+        <td><span class="tag ops">품질</span></td>
+        <td>e2e 테스트</td>
+        <td>
+          <ul class="feature-list">
+            <li>Playwright 또는 Cypress로 e2e 테스트 1~2개 작성</li>
+            <li>로그인·권한 시나리오 검증</li>
+          </ul>
+        </td>
+        <td>
+          <span class="deliverable">e2e 테스트 코드</span>
+          <span class="deliverable">docs/p2/e2e-cases.md</span>
+        </td>
+      </tr>
+
+      <!-- 운영 모니터링 -->
+      <tr>
+        <td><span class="tag ops">운영</span></td>
+        <td>모니터링·성능</td>
+        <td>
+          <ul class="feature-list">
+            <li>에러 수집 연동 (Sentry 또는 로그 기반 알림)</li>
+            <li>슬로우 쿼리 분석 및 인덱스 최적화</li>
+            <li>페이지네이션 적용 (API 목록 응답)</li>
+            <li>성능 개선 전/후 기록</li>
+          </ul>
+        </td>
+        <td>
+          <span class="deliverable">docs/p2/observability.md</span>
+          <span class="deliverable">docs/p2/perf-notes.md</span>
+        </td>
+      </tr>
+
+      <!-- P1 리뷰 -->
+      <tr>
+        <td><span class="tag all">리뷰</span></td>
+        <td>P1 회고</td>
+        <td>
+          <ul class="feature-list">
+            <li>P1 기술 부채 및 개선 사항 정리</li>
+            <li>P1 회고 문서 작성 (잘한 점 / 개선점 / 다음 단계)</li>
+          </ul>
+        </td>
+        <td>
+          <span class="deliverable">docs/p1/retrospective.md</span>
+        </td>
+      </tr>
+
+    </tbody>
+  </table>
+</div>
+
+
+<!-- ══════════════════════════════
+     P3
+══════════════════════════════ -->
+<div class="section">
+  <div class="section-header p3">
+    <span class="phase-label">P3</span>
+    <span class="phase-title">운영형/외부연동+관측성 — 구독·스케줄러·Webhook·결제·배포</span>
+    <span class="phase-period">11~16주차 → 최종발표 6/29~30</span>
+  </div>
+  <table>
+    <thead>
+      <tr>
+        <th style="width:90px">분야</th>
+        <th style="width:160px">카테고리</th>
+        <th>구현 기능</th>
+        <th style="width:220px">주요 산출물</th>
+      </tr>
+    </thead>
+    <tbody>
+
+      <!-- 설계 -->
+      <tr>
+        <td><span class="tag all">설계</span></td>
+        <td>P3 설계</td>
+        <td>
+          <ul class="feature-list">
+            <li>외부 API 연동 설계 (실패 처리 / 재시도 정책 / Rate Limit)</li>
+            <li>스케줄러(cron/queue) 설계</li>
+            <li>배치/워커 아키텍처 설계</li>
+            <li>보안·테스트·운영 계획 수립</li>
+          </ul>
+        </td>
+        <td>
+          <span class="deliverable">docs/p3/requirements.md</span>
+          <span class="deliverable">docs/p3/architecture.md</span>
+        </td>
+      </tr>
+
+      <!-- 외부연동 -->
+      <tr>
+        <td><span class="tag backend">백엔드</span></td>
+        <td>외부 서비스 연동</td>
+        <td>
+          <ul class="feature-list">
+            <li>알림 연동 1개 선택 구현: 이메일 / 디스코드 / Webhook</li>
+            <li>외부 API 호출 실패 시 재시도 정책 (Retry + Exponential Backoff)</li>
+            <li>Idempotency (중복 방지) 처리</li>
+          </ul>
+        </td>
+        <td>
+          <span class="deliverable">백엔드 코드</span>
+          <span class="deliverable">docs/p3/job-spec.md</span>
+        </td>
+      </tr>
+
+      <!-- 배치/스케줄러 -->
+      <tr>
+        <td><span class="tag backend">백엔드</span></td>
+        <td>배치·스케줄러</td>
+        <td>
+          <ul class="feature-list">
+            <li>스케줄러 구현 (cron 또는 queue 기반 주기적 작업)</li>
+            <li>작업 로그 / 작업 상태 테이블 관리</li>
+            <li>배치 통합 테스트 1개 작성</li>
+          </ul>
+        </td>
+        <td>
+          <span class="deliverable">docs/p3/job-spec.md</span>
+        </td>
+      </tr>
+
+      <!-- 결제 -->
+      <tr>
+        <td><span class="tag backend">백엔드</span></td>
+        <td>결제 모듈</td>
+        <td>
+          <ul class="feature-list">
+            <li>결제 모듈 연동 (PG사 API 연결)</li>
+            <li>결제 상태 관리 및 영수증 처리</li>
+          </ul>
+        </td>
+        <td>
+          <span class="deliverable">백엔드 코드</span>
+        </td>
+      </tr>
+
+      <!-- 보안 -->
+      <tr>
+        <td><span class="tag security">보안</span></td>
+        <td>운영 보안</td>
+        <td>
+          <ul class="feature-list">
+            <li>SQL Injection / XSS 최종 점검 및 강화 (P2 연장)</li>
+            <li>시크릿/환경변수 관리 문서화</li>
+            <li>외부 API 인증 키 보안 관리</li>
+          </ul>
+        </td>
+        <td>
+          <span class="deliverable">CI/CD 시크릿 관리 문서</span>
+        </td>
+      </tr>
+
+      <!-- 운영 관측성 -->
+      <tr>
+        <td><span class="tag ops">운영</span></td>
+        <td>관측성 (Observability)</td>
+        <td>
+          <ul class="feature-list">
+            <li>구조화 로그 고도화</li>
+            <li>메트릭 수집 및 헬스체크 고도화</li>
+            <li>Sentry 또는 OpenTelemetry 연동</li>
+            <li>장애 상황 리허설 (외부 API 다운 / DB 다운 가정)</li>
+            <li>사고 보고서 샘플 작성</li>
+          </ul>
+        </td>
+        <td>
+          <span class="deliverable">docs/p3/runbook.md</span>
+          <span class="deliverable">docs/p3/incident-report-sample.md</span>
+        </td>
+      </tr>
+
+      <!-- 성능 최적화 -->
+      <tr>
+        <td><span class="tag ops">운영</span></td>
+        <td>성능 최적화</td>
+        <td>
+          <ul class="feature-list">
+            <li>DB 쿼리 최적화 (인덱스·슬로우 쿼리 분석 심화)</li>
+            <li>프론트 화면 렌더링 시간 단축 (Lazy Load / Code Splitting 등)</li>
+            <li>코드 리팩토링 (가독성·중복 제거)</li>
+            <li>성능 개선 전/후 측정 기록</li>
+          </ul>
+        </td>
+        <td>
+          <span class="deliverable">docs/p3/perf-notes.md</span>
+        </td>
+      </tr>
+
+      <!-- CI/CD 배포 -->
+      <tr>
+        <td><span class="tag ops">CI/CD</span></td>
+        <td>배포 자동화</td>
+        <td>
+          <ul class="feature-list">
+            <li>CI/CD 파이프라인 완성 (GitHub Actions build/test/lint/deploy)</li>
+            <li>Cloud 배포 (EC2 / LightSail / Fly.io / Render 중 선택)</li>
+            <li>Docker / Docker Compose 운영 환경 설정</li>
+            <li>환경변수 및 시크릿 분리 관리</li>
+          </ul>
+        </td>
+        <td>
+          <span class="deliverable">.github/workflows/cd.yml</span>
+          <span class="deliverable">docker-compose.yml</span>
+        </td>
+      </tr>
+
+      <!-- 포트폴리오 -->
+      <tr>
+        <td><span class="tag all">마무리</span></td>
+        <td>포트폴리오화</td>
+        <td>
+          <ul class="feature-list">
+            <li>3개 프로젝트(P1~P3) 산출물 공통 템플릿화</li>
+            <li>기술 의사결정 기록 (ADR) 최소 3개 작성</li>
+            <li>최종 회고 작성 (학습 내용 / 개선 / 다음 단계)</li>
+            <li>PORTFOLIO.md 작성 (요약 / 링크 / 데모)</li>
+          </ul>
+        </td>
+        <td>
+          <span class="deliverable">PORTFOLIO.md</span>
+          <span class="deliverable">docs/adr/ (3개+)</span>
+          <span class="deliverable">final-retrospective.md</span>
+        </td>
+      </tr>
+
+    </tbody>
+  </table>
+</div>
+
+
+<!-- ══════════════════════════════
+     전체 산출물 체크리스트
+══════════════════════════════ -->
+<div class="section">
+  <div class="section-header" style="background:#f2f4f7;border-color:#aaa;">
+    <span class="phase-label" style="color:#333;font-size:13px;">📋</span>
+    <span class="phase-title">전체 산출물 체크리스트 (A~F)</span>
+  </div>
+  <table>
+    <thead>
+      <tr>
+        <th style="width:50px">구분</th>
+        <th style="width:140px">영역</th>
+        <th>산출물 목록</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><strong>A</strong></td>
+        <td>기획/요구사항</td>
+        <td>요구사항 문서 (유저 스토리+AC) · 범위 정의 (MVP/추가기능) · 일정/마일스톤</td>
+      </tr>
+      <tr>
+        <td><strong>B</strong></td>
+        <td>설계</td>
+        <td>아키텍처 다이어그램 · ERD · OpenAPI 명세 · 보안 설계 (인증/인가/위협모델) · 테스트 계획</td>
+      </tr>
+      <tr>
+        <td><strong>C</strong></td>
+        <td>구현</td>
+        <td>프론트/백엔드 코드 · 코딩 규칙/폴더 구조 설명 · 예외/에러코드 규격</td>
+      </tr>
+      <tr>
+        <td><strong>D</strong></td>
+        <td>품질</td>
+        <td>유닛/통합/e2e 테스트 최소 세트 · 린트/포맷/정적분석 (가능하면)</td>
+      </tr>
+      <tr>
+        <td><strong>E</strong></td>
+        <td>CI/CD</td>
+        <td>CI 워크플로우 (build/test/lint) · CD 워크플로우 (배포 자동화) · 환경변수/시크릿 관리 문서</td>
+      </tr>
+      <tr>
+        <td><strong>F</strong></td>
+        <td>운영</td>
+        <td>Runbook (배포/롤백/장애대응) · 모니터링 (로그/헬스체크/알림) · 사고 보고서 템플릿 · 리뷰 및 개선 목록</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+<div style="text-align:center;color:#bbb;font-size:11px;margin-top:24px;padding-bottom:8px;">
+  2026년 3학년 1학기 프로젝트 실습 수업 계획서 기반 정리 · 인쇄 시 Ctrl+P
+</div>
+
+</body>
+</html>
