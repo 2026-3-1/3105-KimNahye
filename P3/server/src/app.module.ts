@@ -94,10 +94,7 @@ import { SchedulerModule } from './scheduler/scheduler.module';
         autoLoadEntities: true,
         // NODE_ENV가 'dev'일 때만 스키마 자동 동기화 (운영 DB 보호)
         synchronize: config.get('NODE_ENV') === 'dev',
-        ssl:
-          config.get('NODE_ENV') === 'prod'
-            ? { rejectUnauthorized: false }
-            : false,
+        ssl: config.get('DB_SSL') === 'true' ? { rejectUnauthorized: false } : false,
       }),
     }),
 

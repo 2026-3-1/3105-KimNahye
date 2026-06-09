@@ -13,15 +13,15 @@ async function bootstrap() {
 
   const configService = app.get(ConfigService);
   const port = configService.get<number>('PORT', 8080);
-  const isDev = configService.get<string>('NODE_ENV') !== 'prod';
+  const swaggerEnabled = configService.get<string>('SWAGGER_ENABLED') === 'true';
 
   app.setGlobalPrefix('api/v1');
 
-  // 보안 헤더 (CSP, HSTS, X-Frame-Options 등)
+  // HSTS/CSP 비활성화 — HTTP 환경에서 HTTPS 강제 방지
   app.use(
     helmet({
-      contentSecurityPolicy: false,
       hsts: false,
+      contentSecurityPolicy: false,
     }),
   );
 
@@ -32,8 +32,8 @@ async function bootstrap() {
     credentials: true,
   });
 
-  // Swagger — 개발 환경에서만 노출
-  if (isDev) {
+  // Swagger — SWAGGER_ENABLED=true 일 때 노출
+  if (swaggerEnabled) {
     const swaggerConfig = new DocumentBuilder()
       .setTitle('자취생 맞춤형 요리 교육 커리큘럼 API')
       .setDescription(
@@ -78,7 +78,7 @@ async function bootstrap() {
 
   await app.listen(port);
   console.log(`🚀 서버 실행 중: http://localhost:${port}`);
-  if (isDev) {
+  if (swaggerEnabled) {
     console.log(`📄 Swagger 문서: http://localhost:${port}/api/docs`);
   }
 }
