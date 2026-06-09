@@ -34,12 +34,14 @@ async function bootstrap() {
 
   // Swagger — SWAGGER_ENABLED=true 일 때 노출
   if (swaggerEnabled) {
+    const publicUrl = configService.get<string>('PUBLIC_URL', `http://localhost:${port}`);
     const swaggerConfig = new DocumentBuilder()
       .setTitle('자취생 맞춤형 요리 교육 커리큘럼 API')
       .setDescription(
         '유튜브 오픈 데이터를 활용한 자취생 맞춤형 인터랙티브 요리 교육 커리큘럼 서비스 API 문서',
       )
       .setVersion('1.0.0')
+      .addServer(publicUrl)
       .addTag('인증 (Auth)', '회원가입 / 로그인 / 토큰 관리')
       .addBearerAuth(
         {
@@ -71,6 +73,7 @@ async function bootstrap() {
         persistAuthorization: true,
         tagsSorter: 'alpha',
         operationsSorter: 'alpha',
+        oauth2RedirectUrl: `${publicUrl}/api/docs/oauth2-redirect.html`,
       },
       customSiteTitle: '요리 교육 API 문서',
     });
