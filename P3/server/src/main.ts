@@ -18,7 +18,11 @@ async function bootstrap() {
   app.setGlobalPrefix('api/v1');
 
   // 보안 헤더 (CSP, HSTS, X-Frame-Options 등)
-  app.use(helmet());
+  app.use(
+    helmet({
+      contentSecurityPolicy: false,
+    }),
+  );
 
   // CORS — 허용 출처를 환경변수로 명시적 제한
   const clientUrl = configService.get<string>('CLIENT_URL', 'http://localhost:5173');
