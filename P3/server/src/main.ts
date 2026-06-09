@@ -1,7 +1,6 @@
 import { NestFactory } from '@nestjs/core';
 import { ConfigService } from '@nestjs/config';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
-import helmet from 'helmet';
 import { WINSTON_MODULE_NEST_PROVIDER } from 'nest-winston';
 import { AppModule } from './app.module';
 
@@ -16,14 +15,6 @@ async function bootstrap() {
   const swaggerEnabled = configService.get<string>('SWAGGER_ENABLED') === 'true';
 
   app.setGlobalPrefix('api/v1');
-
-  // HSTS/CSP 비활성화 — HTTP 환경에서 HTTPS 강제 방지
-  app.use(
-    helmet({
-      hsts: false,
-      contentSecurityPolicy: false,
-    }),
-  );
 
   // CORS — 허용 출처를 환경변수로 명시적 제한
   const clientUrl = configService.get<string>('CLIENT_URL', 'http://localhost:5173');
