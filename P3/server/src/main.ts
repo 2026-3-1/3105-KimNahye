@@ -26,7 +26,10 @@ async function bootstrap() {
   app.useLogger(app.get(WINSTON_MODULE_NEST_PROVIDER));
 
   // HTTP 보안 헤더 (XSS, 클릭재킹, MIME 스니핑 방어)
-  app.use(helmet());
+  app.use(helmet({
+    hsts: false,
+    contentSecurityPolicy: false,
+  }));
 
   const configService = app.get(ConfigService);
   const port = configService.get<number>('PORT', 8080);
