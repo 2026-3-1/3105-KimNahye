@@ -45,7 +45,7 @@ import { AdminModule } from './admin/admin.module';
           format: winston.format.combine(
             winston.format.timestamp(),
             winston.format.printf(({ timestamp, level, context, message }) => {
-              return `[${String(timestamp)}] [${String(level).toUpperCase()}] [${String(context ?? 'App')}] ${String(message)}`;
+              return `[${String(timestamp)}] [${String(level).toUpperCase()}] [${typeof context === 'string' ? context : 'App'}] ${String(message)}`;
             }),
           ),
         }),
