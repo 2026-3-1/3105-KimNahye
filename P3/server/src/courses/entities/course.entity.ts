@@ -3,6 +3,7 @@ import {
   Column,
   CreateDateColumn,
   Entity,
+  Index,
   ManyToOne,
   OneToMany,
   PrimaryGeneratedColumn,
@@ -14,6 +15,7 @@ import { Difficulty } from './enums/difficulty.enum';
 import { Enrollment } from 'src/enrollments/entities/enrollment.entity';
 
 @Entity('courses')
+@Index(['category', 'difficulty'])
 export class Course {
   @PrimaryGeneratedColumn('uuid')
   id: string;

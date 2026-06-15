@@ -1,7 +1,22 @@
+import * as Sentry from '@sentry/nestjs';
+import { nodeProfilingIntegration } from '@sentry/profiling-node';
+
+// Sentry는 NestJS 앱 생성 전에 초기화해야 함
+if (process.env.SENTRY_DSN) {
+  Sentry.init({
+    dsn: process.env.SENTRY_DSN,
+    environment: process.env.NODE_ENV ?? 'production',
+    integrations: [nodeProfilingIntegration()],
+    tracesSampleRate: 0.2,
+    profilesSampleRate: 0.1,
+  });
+}
+
 import { NestFactory } from '@nestjs/core';
 import { ConfigService } from '@nestjs/config';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import { WINSTON_MODULE_NEST_PROVIDER } from 'nest-winston';
+import helmet from 'helmet';
 import { AppModule } from './app.module';
 
 async function bootstrap() {
@@ -9,6 +24,9 @@ async function bootstrap() {
 
   // Winston 구조화 로그 적용
   app.useLogger(app.get(WINSTON_MODULE_NEST_PROVIDER));
+
+  // HTTP 보안 헤더 (XSS, 클릭재킹, MIME 스니핑 방어)
+  app.use(helmet());
 
   const configService = app.get(ConfigService);
   const port = configService.get<number>('PORT', 8080);

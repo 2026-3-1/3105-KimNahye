@@ -17,10 +17,16 @@
     "test:watch": "jest --watch",
     "test:cov": "jest --coverage",
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
-    "test:e2e": "jest --config ./test/jest-e2e.json"
+    "test:e2e": "jest --config ./test/jest-e2e.json",
+    "typeorm": "ts-node -r tsconfig-paths/register ./node_modules/typeorm/cli.js --dataSource src/data-source.ts",
+    "migration:run": "npm run typeorm -- migration:run",
+    "migration:revert": "npm run typeorm -- migration:revert",
+    "migration:generate": "npm run typeorm -- migration:generate src/migrations/Migration",
+    "migration:show": "npm run typeorm -- migration:show"
   },
   "dependencies": {
     "@keyv/redis": "^5.1.5",
+    "@nestjs-modules/mailer": "^2.0.2",
     "@nestjs/cache-manager": "^3.1.2",
     "@nestjs/common": "^11.0.1",
     "@nestjs/config": "^4.0.3",
@@ -33,7 +39,8 @@
     "@nestjs/terminus": "^11.1.1",
     "@nestjs/throttler": "^6.4.0",
     "@nestjs/typeorm": "^11.0.0",
-    "@nestjs-modules/mailer": "^2.0.2",
+    "@sentry/nestjs": "^10.57.0",
+    "@sentry/profiling-node": "^10.57.0",
     "@types/passport-jwt": "^4.0.1",
     "@willsoto/nestjs-prometheus": "^6.0.0",
     "axios": "^1.9.0",
@@ -61,9 +68,9 @@
     "@nestjs/testing": "^11.0.1",
     "@types/bcrypt": "^6.0.0",
     "@types/express": "^5.0.0",
-    "@types/nodemailer": "^6.4.17",
     "@types/jest": "^30.0.0",
     "@types/node": "^22.10.7",
+    "@types/nodemailer": "^6.4.17",
     "@types/supertest": "^6.0.2",
     "eslint": "^9.18.0",
     "eslint-config-prettier": "^10.0.1",
@@ -90,6 +97,12 @@
     "testRegex": ".*\\.spec\\.ts$",
     "transform": {
       "^.+\\.(t|j)s$": "ts-jest"
+    },
+    "moduleNameMapper": {
+      "^src/(.*)$": "<rootDir>/$1",
+      "^@auth/(.*)$": "<rootDir>/auth/$1",
+      "^@users/(.*)$": "<rootDir>/users/$1",
+      "^@common/(.*)$": "<rootDir>/common/$1"
     },
     "collectCoverageFrom": [
       "**/*.(t|j)s"

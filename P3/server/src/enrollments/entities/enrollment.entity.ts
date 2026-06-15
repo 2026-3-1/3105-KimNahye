@@ -5,6 +5,7 @@ import {
   Column,
   CreateDateColumn,
   Entity,
+  Index,
   JoinTable,
   ManyToMany,
   ManyToOne,
@@ -12,6 +13,7 @@ import {
 } from 'typeorm';
 
 @Entity('enrollments')
+@Index(['user', 'course'])
 export class Enrollment {
   @PrimaryGeneratedColumn('uuid')
   id: string;
