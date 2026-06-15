@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react"
 import { useSearchParams, useNavigate } from "react-router-dom"
 import { confirmPayment } from "../api/PaymentApi"
+import { clearCart } from "../api/CartApi"
 import type { AxiosError } from "axios"
 
 type Status = "loading" | "success" | "error"
@@ -16,17 +17,22 @@ export default function PaymentSuccess() {
       const paymentKey = searchParams.get("paymentKey")
       const orderId = searchParams.get("orderId")
       const amount = searchParams.get("amount")
-      const courseId = sessionStorage.getItem("pendingCourseId")
+      const courseIdsRaw = sessionStorage.getItem("pendingCourseIds")
+      const courseIds: string[] | null = courseIdsRaw ? JSON.parse(courseIdsRaw) : null
 
-      if (!paymentKey || !orderId || !amount || !courseId) {
+      if (!paymentKey || !orderId || !amount || !courseIds?.length) {
         setErrorMsg("결제 정보가 올바르지 않습니다.")
         setStatus("error")
         return
       }
 
       try {
-        await confirmPayment({ paymentKey, orderId, amount: Number(amount), courseId })
-        sessionStorage.removeItem("pendingCourseId")
+        await confirmPayment({ paymentKey, orderId, amount: Number(amount), courseIds })
+        sessionStorage.removeItem("pendingCourseIds")
+        if (sessionStorage.getItem("pendingFromCart")) {
+          sessionStorage.removeItem("pendingFromCart")
+          clearCart().catch(() => {})
+        }
         setStatus("success")
       } catch (err) {
         const axiosError = err as AxiosError<{ message: string }>

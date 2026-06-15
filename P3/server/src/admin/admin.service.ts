@@ -19,7 +19,7 @@ export class AdminService {
 
   findAllUsers(): Promise<User[]> {
     return this.userRepository.find({
-      select: ['id', 'email', 'nickname', 'role', 'createdAt'],
+      select: { id: true, email: true, nickname: true, role: true, createdAt: true },
       order: { createdAt: 'DESC' },
     });
   }
@@ -33,7 +33,7 @@ export class AdminService {
 
   findAllCourses(): Promise<Course[]> {
     return this.courseRepository.find({
-      relations: ['teacher'],
+      relations: { teacher: true },
       order: { createdAt: 'DESC' },
     });
   }

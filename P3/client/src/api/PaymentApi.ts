@@ -4,7 +4,7 @@ interface ConfirmPaymentRequest {
   paymentKey: string
   orderId: string
   amount: number
-  courseId: string
+  courseIds: string[]
 }
 
 export const confirmPayment = (data: ConfirmPaymentRequest) =>

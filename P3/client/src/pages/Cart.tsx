@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback } from "react"
 import { useNavigate } from "react-router-dom"
+import { loadTossPayments, ANONYMOUS } from "@tosspayments/tosspayments-sdk"
 import { getCart, removeFromCart, clearCart } from "../api/CartApi"
-import { enrollCourse } from "../api/EnrollmentApi"
 import useAuthStore from "../store/AuthStore"
 import styles from "./Cart.module.css"
 
@@ -34,7 +34,7 @@ const CATEGORY_LABEL: Record<string, string> = {
 
 export default function Cart() {
   const navigate = useNavigate()
-  const { isAuthenticated } = useAuthStore()
+  const { isAuthenticated, user } = useAuthStore()
   const [items, setItems] = useState<CartItem[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState("")
@@ -86,13 +86,23 @@ export default function Cart() {
     if (items.length === 0) return
     setPaying(true)
     try {
-      // 장바구니 내 모든 강의 수강 신청 처리
-      await Promise.all(items.map((item) => enrollCourse(item.courseId).catch(() => {})))
-      await clearCart()
-      setItems([])
-      setPaySuccess(true)
+      const clientKey = import.meta.env.VITE_TOSS_CLIENT_KEY as string
+      const tossPayments = await loadTossPayments(clientKey)
+      const payment = tossPayments.payment({ customerKey: user?.id ?? ANONYMOUS })
+      sessionStorage.setItem("pendingCourseIds", JSON.stringify(items.map((i) => i.courseId)))
+      sessionStorage.setItem("pendingFromCart", "true")
+      await payment.requestPayment({
+        method: "CARD",
+        amount: { currency: "KRW", value: totalPrice },
+        orderId: `cart_${Date.now()}`,
+        orderName: items.length === 1 ? `${items[0].category} 클래스` : `강의 ${items.length}개`,
+        successUrl: `${window.location.origin}/payment/success`,
+        failUrl: `${window.location.origin}/payment/fail`,
+      })
     } catch {
-      alert("결제에 실패했습니다. 다시 시도해주세요.")
+      sessionStorage.removeItem("pendingCourseIds")
+      sessionStorage.removeItem("pendingFromCart")
+      alert("결제를 시작할 수 없습니다. 다시 시도해주세요.")
     } finally {
       setPaying(false)
     }

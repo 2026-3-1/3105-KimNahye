@@ -1,7 +1,8 @@
-import { BrowserRouter, Routes, Route } from "react-router-dom"
+import { BrowserRouter, Routes, Route, useLocation } from "react-router-dom"
 import { lazy, Suspense, useEffect } from "react"
 import Navbar from "./components/layout/Navbar"
 import ProtectedRoute from "./components/ProtectedRoute"
+import AdminRoute from "./components/AdminRoute"
 import useAuthStore from "./store/AuthStore"
 import { getMyInfo } from "./api/UserApi"
 
@@ -21,9 +22,12 @@ const TeacherCourses = lazy(() => import("./pages/TeacherCourse"))
 const PaymentSuccess = lazy(() => import("./pages/PaymentSuccess"))
 const PaymentFail = lazy(() => import("./pages/PaymentFail"))
 const Admin = lazy(() => import("./pages/Admin"))
+const AdminLogin = lazy(() => import("./pages/AdminLogin"))
 
-export default function App() {
+function AppInner() {
   const { isAuthenticated, setUser } = useAuthStore()
+  const location = useLocation()
+  const isAdminArea = location.pathname.startsWith("/admin")
 
   useEffect(() => {
     if (!isAuthenticated) return
@@ -36,8 +40,8 @@ export default function App() {
   }, [])
 
   return (
-    <BrowserRouter>
-      <Navbar />
+    <>
+      {!isAdminArea && <Navbar />}
       <Suspense fallback={<div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>로딩 중...</div>}>
         <Routes>
           <Route path="/" element={<Home />} />
@@ -58,14 +62,23 @@ export default function App() {
           <Route path="/teacher/edit/:id" element={<ProtectedRoute role="teacher"><EditCourse /></ProtectedRoute>} />
           <Route path="/videos/register/:courseId" element={<ProtectedRoute role="teacher"><RegisterVideo /></ProtectedRoute>} />
 
-          {/* ADMIN 전용 */}
-          <Route path="/admin" element={<ProtectedRoute role="admin"><Admin /></ProtectedRoute>} />
-
           {/* 결제 */}
           <Route path="/payment/success" element={<ProtectedRoute><PaymentSuccess /></ProtectedRoute>} />
           <Route path="/payment/fail" element={<PaymentFail />} />
+
+          {/* ADMIN 전용 (완전 분리) */}
+          <Route path="/admin/login" element={<AdminLogin />} />
+          <Route path="/admin" element={<AdminRoute><Admin /></AdminRoute>} />
         </Routes>
       </Suspense>
+    </>
+  )
+}
+
+export default function App() {
+  return (
+    <BrowserRouter>
+      <AppInner />
     </BrowserRouter>
   )
 }

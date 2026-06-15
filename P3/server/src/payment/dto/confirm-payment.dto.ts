@@ -1,4 +1,4 @@
-import { IsNotEmpty, IsNumber, IsString, Min } from 'class-validator';
+import { ArrayMinSize, IsArray, IsNotEmpty, IsNumber, IsString, Min } from 'class-validator';
 
 export class ConfirmPaymentDto {
   @IsString()
@@ -13,7 +13,8 @@ export class ConfirmPaymentDto {
   @Min(0)
   amount: number;
 
-  @IsString()
-  @IsNotEmpty()
-  courseId: string;
+  @IsArray()
+  @ArrayMinSize(1)
+  @IsString({ each: true })
+  courseIds: string[];
 }

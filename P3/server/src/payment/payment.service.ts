@@ -49,11 +49,14 @@ export class PaymentService {
     }
 
     // 서버 측 가격 검증 (amount tampering 방지)
-    const course = await this.courseService.findById(dto.courseId);
-    if (!course) {
-      throw new NotFoundException('존재하지 않는 강좌입니다.');
+    const courses = await Promise.all(
+      dto.courseIds.map((id) => this.courseService.findById(id)),
+    );
+    for (const course of courses) {
+      if (!course) throw new NotFoundException('존재하지 않는 강좌입니다.');
     }
-    if (dto.amount !== course.price) {
+    const totalPrice = courses.reduce((sum, c) => sum + c!.price, 0);
+    if (dto.amount !== totalPrice) {
       throw new BadRequestException('결제 금액이 강좌 가격과 일치하지 않습니다.');
     }
 
@@ -66,7 +69,7 @@ export class PaymentService {
       const { data } = await withRetry(() =>
         axios.post<TossConfirmResponse>(
           'https://api.tosspayments.com/v1/payments/confirm',
-          { paymentKey: dto.paymentKey, orderId: dto.orderId, amount: course.price },
+          { paymentKey: dto.paymentKey, orderId: dto.orderId, amount: totalPrice },
           {
             headers: {
               Authorization: `Basic ${encoded}`,
@@ -83,29 +86,33 @@ export class PaymentService {
       throw new BadRequestException(message);
     }
 
-    // 결제 기록 저장
+    // 결제 기록 저장 (courseId 컬럼에 콤마 구분 문자열로 저장)
     await this.paymentRepository.save(
       this.paymentRepository.create({
         paymentKey: dto.paymentKey,
         orderId: dto.orderId,
         userId,
-        courseId: dto.courseId,
-        amount: course.price,
+        courseId: dto.courseIds.join(','),
+        amount: totalPrice,
       }),
     );
 
-    const enrollment = await this.enrollmentService.enroll(userId, dto.courseId);
+    const enrollments = await Promise.all(
+      dto.courseIds.map((courseId) =>
+        this.enrollmentService.enroll(userId, courseId),
+      ),
+    );
 
     // 이메일 발송 (실패해도 결제/수강에 영향 없음)
     const user = await this.userService.findById(userId);
     if (user) {
-      const courseName = paymentData?.orderName ?? course.price + '원 강의';
+      const courseName = paymentData?.orderName ?? totalPrice + '원 강의';
       this.mailService
-        .sendEnrollmentConfirmation(user.email, user.nickname, courseName, course.price)
+        .sendEnrollmentConfirmation(user.email, user.nickname, courseName, totalPrice)
         .catch(() => {});
     }
 
-    return enrollment;
+    return enrollments;
   }
 
   async handleWebhook(signature: string | undefined, body: WebhookEventDto): Promise<void> {

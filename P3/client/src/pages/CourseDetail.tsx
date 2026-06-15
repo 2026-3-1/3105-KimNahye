@@ -152,7 +152,7 @@ export default function CourseDetailPage() {
       const clientKey = import.meta.env.VITE_TOSS_CLIENT_KEY as string
       const tossPayments = await loadTossPayments(clientKey)
       const payment = tossPayments.payment({ customerKey: user?.id ?? ANONYMOUS })
-      sessionStorage.setItem("pendingCourseId", id)
+      sessionStorage.setItem("pendingCourseIds", JSON.stringify([id]))
       await payment.requestPayment({
         method: "CARD",
         amount: { currency: "KRW", value: course.price },
@@ -162,7 +162,7 @@ export default function CourseDetailPage() {
         failUrl: `${window.location.origin}/payment/fail`,
       })
     } catch {
-      sessionStorage.removeItem("pendingCourseId")
+      sessionStorage.removeItem("pendingCourseIds")
     } finally {
       setPaying(false)
     }
