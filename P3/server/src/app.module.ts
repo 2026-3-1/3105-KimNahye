@@ -28,6 +28,7 @@ import { MailModule } from './mail/mail.module';
 import { PaymentModule } from './payment/payment.module';
 import { MonitoringModule } from './monitoring/monitoring.module';
 import { SchedulerModule } from './scheduler/scheduler.module';
+import { AdminModule } from './admin/admin.module';
 
 @Module({
   imports: [
@@ -115,6 +116,7 @@ import { SchedulerModule } from './scheduler/scheduler.module';
     BookmarkModule,
     MailModule,
     PaymentModule,
+    AdminModule,
 
     // 8. 모니터링 (Health Check + Prometheus)
     MonitoringModule,

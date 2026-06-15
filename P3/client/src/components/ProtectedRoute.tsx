@@ -3,7 +3,7 @@ import useAuthStore from "../store/AuthStore"
 
 interface Props {
   children: React.ReactNode
-  role?: "teacher" | "student"
+  role?: "teacher" | "student" | "admin"
 }
 
 export default function ProtectedRoute({ children, role }: Props) {

@@ -20,6 +20,7 @@ const RegisterVideo = lazy(() => import("./pages/RegisterVideo"))
 const TeacherCourses = lazy(() => import("./pages/TeacherCourse"))
 const PaymentSuccess = lazy(() => import("./pages/PaymentSuccess"))
 const PaymentFail = lazy(() => import("./pages/PaymentFail"))
+const Admin = lazy(() => import("./pages/Admin"))
 
 export default function App() {
   const { isAuthenticated, setUser } = useAuthStore()
@@ -56,6 +57,9 @@ export default function App() {
           <Route path="/teacher" element={<ProtectedRoute role="teacher"><TeacherCourses /></ProtectedRoute>} />
           <Route path="/teacher/edit/:id" element={<ProtectedRoute role="teacher"><EditCourse /></ProtectedRoute>} />
           <Route path="/videos/register/:courseId" element={<ProtectedRoute role="teacher"><RegisterVideo /></ProtectedRoute>} />
+
+          {/* ADMIN 전용 */}
+          <Route path="/admin" element={<ProtectedRoute role="admin"><Admin /></ProtectedRoute>} />
 
           {/* 결제 */}
           <Route path="/payment/success" element={<ProtectedRoute><PaymentSuccess /></ProtectedRoute>} />
