@@ -18,17 +18,6 @@ services:
     networks:
       - app-network
 
-  react:
-    image: 3n1hye/solvingmeal-frontend:latest
-    container_name: frontend
-    restart: always
-    ports:
-      - "3000:3000"
-    depends_on:
-      - nestjs
-    networks:
-      - app-network
-
   redis:
     image: redis:7-alpine
     container_name: redis
