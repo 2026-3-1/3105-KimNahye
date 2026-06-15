@@ -11,6 +11,7 @@ export default function PaymentSuccess() {
   const navigate = useNavigate()
   const [status, setStatus] = useState<Status>("loading")
   const [errorMsg, setErrorMsg] = useState("")
+  const [courseId, setCourseId] = useState<string | null>(null)
 
   useEffect(() => {
     const run = async () => {
@@ -33,6 +34,7 @@ export default function PaymentSuccess() {
           sessionStorage.removeItem("pendingFromCart")
           clearCart().catch(() => {})
         }
+        setCourseId(courseIds[0])
         setStatus("success")
       } catch (err) {
         const axiosError = err as AxiosError<{ message: string }>
@@ -68,6 +70,11 @@ export default function PaymentSuccess() {
     cursor: "pointer",
   }
 
+  const btnSecondaryStyle: React.CSSProperties = {
+    ...btnStyle,
+    background: "#b2bec3",
+  }
+
   if (status === "loading") {
     return (
       <div style={containerStyle}>
@@ -93,9 +100,16 @@ export default function PaymentSuccess() {
       <div style={{ fontSize: "3rem" }}>✅</div>
       <h2 style={{ margin: 0 }}>결제가 완료되었습니다!</h2>
       <p style={{ color: "#555" }}>수강 신청이 완료되었습니다. 이메일을 확인해주세요.</p>
-      <button style={btnStyle} onClick={() => navigate("/my-courses")}>
-        내 강의 보러가기
-      </button>
+      <div style={{ display: "flex", gap: "12px", flexWrap: "wrap", justifyContent: "center" }}>
+        {courseId && (
+          <button style={btnStyle} onClick={() => navigate(`/courses/${courseId}`)}>
+            강의 바로 보기
+          </button>
+        )}
+        <button style={btnSecondaryStyle} onClick={() => navigate("/my-courses")}>
+          내 강의 목록
+        </button>
+      </div>
     </div>
   )
 }
