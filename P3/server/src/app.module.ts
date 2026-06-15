@@ -44,7 +44,7 @@ import { SchedulerModule } from './scheduler/scheduler.module';
           format: winston.format.combine(
             winston.format.timestamp(),
             winston.format.printf(({ timestamp, level, context, message }) => {
-              return `[${timestamp}] [${level.toUpperCase()}] [${context ?? 'App'}] ${message}`;
+              return `[${String(timestamp)}] [${String(level).toUpperCase()}] [${String(context ?? 'App')}] ${String(message)}`;
             }),
           ),
         }),

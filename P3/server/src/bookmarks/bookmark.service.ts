@@ -10,6 +10,7 @@ import {
   IVideoRepository,
   VIDEO_REPOSITORY,
 } from 'src/videos/interfaces/video-repository.interface';
+import { Video } from 'src/videos/entities/video.entity';
 import { CreateBookmarkDto } from './dto/create-bookmark.dto';
 import { UpdateBookmarkDto } from './dto/update-bookmark.dto';
 import { BookmarkResponse } from './dto/bookmark-response.dto';
@@ -28,7 +29,7 @@ export class BookmarkService {
     const user = await this.userService.findById(userId);
     if (!user) throw new NotFoundException('존재하지 않는 사용자입니다.');
 
-    const video = await this.videoRepository.findById(videoId);
+    const video = await this.videoRepository.findById(videoId) as Video | null;
     if (!video) throw new NotFoundException('영상을 찾을 수 없습니다.');
 
     const bookmarks = await this.bookmarkRepository.findByUserAndVideo(user, video);
@@ -45,7 +46,7 @@ export class BookmarkService {
     const user = await this.userService.findById(userId);
     if (!user) throw new NotFoundException('존재하지 않는 사용자입니다.');
 
-    const video = await this.videoRepository.findById(videoId);
+    const video = await this.videoRepository.findById(videoId) as Video | null;
     if (!video) throw new NotFoundException('영상을 찾을 수 없습니다.');
 
     const bookmark = await this.bookmarkRepository.create(user, video, dto.positionSec, dto.note);

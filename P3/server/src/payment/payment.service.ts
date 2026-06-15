@@ -20,6 +20,11 @@ import { Payment } from './entities/payment.entity';
 import { WebhookEventDto } from './dto/webhook-event.dto';
 import { withRetry } from 'src/common/utils/retry.util';
 
+interface TossConfirmResponse {
+  orderName: string;
+  [key: string]: unknown;
+}
+
 @Injectable()
 export class PaymentService {
   private readonly logger = new Logger(PaymentService.name);
@@ -56,10 +61,10 @@ export class PaymentService {
     const secretKey = this.configService.get<string>('TOSS_SECRET_KEY');
     const encoded = Buffer.from(`${secretKey}:`).toString('base64');
 
-    let paymentData: any;
+    let paymentData!: TossConfirmResponse;
     try {
       const { data } = await withRetry(() =>
-        axios.post(
+        axios.post<TossConfirmResponse>(
           'https://api.tosspayments.com/v1/payments/confirm',
           { paymentKey: dto.paymentKey, orderId: dto.orderId, amount: course.price },
           {
@@ -71,7 +76,8 @@ export class PaymentService {
         ),
       );
       paymentData = data;
-    } catch (err: any) {
+    } catch (e: unknown) {
+      const err = e as { response?: { data?: { message?: string } } };
       const message =
         err?.response?.data?.message ?? '결제 승인에 실패했습니다.';
       throw new BadRequestException(message);

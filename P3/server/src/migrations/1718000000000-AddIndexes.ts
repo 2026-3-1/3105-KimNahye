@@ -1,6 +1,7 @@
 import { MigrationInterface, QueryRunner } from 'typeorm';
 
 export class AddIndexes1718000000000 implements MigrationInterface {
+  transaction = false;
   public async up(queryRunner: QueryRunner): Promise<void> {
     await queryRunner.query(`
       CREATE INDEX CONCURRENTLY IF NOT EXISTS "IDX_courses_category_difficulty"

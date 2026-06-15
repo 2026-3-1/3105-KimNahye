@@ -125,7 +125,7 @@ export class VideoService {
     userId: string,
     dto: UpdateProgressDto,
   ): Promise<ProgressResponseDto> {
-    const video = await this.videoRepository.findById(videoId);
+    const video = await this.videoRepository.findById(videoId) as Video | null;
     if (!video) throw new NotFoundException('영상을 찾을 수 없습니다.');
 
     const user = await this.userService.findById(userId);
@@ -150,7 +150,7 @@ export class VideoService {
     videoId: string,
     userId: string,
   ): Promise<ProgressResponseDto> {
-    const video = await this.videoRepository.findById(videoId);
+    const video = await this.videoRepository.findById(videoId) as Video | null;
     if (!video) throw new NotFoundException('영상을 찾을 수 없습니다.');
 
     const user = await this.userService.findById(userId);
