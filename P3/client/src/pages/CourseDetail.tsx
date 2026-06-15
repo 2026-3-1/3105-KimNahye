@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react"
 import { useParams, useNavigate } from "react-router-dom"
 import { loadTossPayments, ANONYMOUS } from "@tosspayments/tosspayments-sdk"
-import { getCourse } from "../api/CourseApi"
+import { getCourse, getMyCourses } from "../api/CourseApi"
 import { enrollCourse } from "../api/EnrollmentApi"
 import { addToCart } from "../api/CartApi"
 import { getCourseReviews, createReview, updateReview, deleteReview } from "../api/ReviewApi"
@@ -71,6 +71,7 @@ export default function CourseDetailPage() {
   const [cartAdding, setCartAdding] = useState(false)
   const [cartMsg, setCartMsg] = useState("")
   const [paying, setPaying] = useState(false)
+  const [isEnrolled, setIsEnrolled] = useState(false)
 
   const [reviews, setReviews] = useState<Review[]>([])
   const [reviewRating, setReviewRating] = useState(5)
@@ -101,6 +102,18 @@ export default function CourseDetailPage() {
     }
     fetch()
   }, [id])
+
+  useEffect(() => {
+    if (!isAuthenticated || !id) return
+    getMyCourses()
+      .then(({ data }) => {
+        const list = (data as any)?.data ?? data
+        if (Array.isArray(list)) {
+          setIsEnrolled(list.some((c: any) => c.id === id))
+        }
+      })
+      .catch(() => {})
+  }, [id, isAuthenticated])
 
   useEffect(() => {
     if (!id) return
@@ -450,6 +463,8 @@ export default function CourseDetailPage() {
                     ✏️ 강의 수정
                   </button>
                 </div>
+              ) : isEnrolled ? (
+                <div className={styles.enrollDone}>✅ 이미 수강 중인 강의입니다</div>
               ) : enrollSuccess ? (
                 <div className={styles.enrollDone}>✅ 수강 신청 완료!</div>
               ) : (
