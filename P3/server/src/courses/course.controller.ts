@@ -8,7 +8,7 @@ import {
   UseGuards,
   UseInterceptors,
 } from '@nestjs/common';
-import { CacheInterceptor, CacheKey, CacheTTL } from '@nestjs/cache-manager';
+import { CacheInterceptor, CacheTTL } from '@nestjs/cache-manager';
 import { CourseService } from './course.service';
 import {
   ApiGetCourseDetail,
@@ -33,7 +33,6 @@ export class CourseController {
   @HttpCode(HttpStatus.OK)
   @ApiGetCourseList()
   @UseInterceptors(CacheInterceptor)
-  @CacheKey('courses_list')
   @CacheTTL(300_000)
   async getCourseList(
     @Query() dto: CourseQueryDto,
