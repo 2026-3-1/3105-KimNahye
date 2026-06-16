@@ -97,7 +97,7 @@ export default function RegisterVideo() {
           <p className={styles.desc}>
             강의에 영상을 추가하세요. 여러 개 등록할 수 있습니다.
           </p>
-          <span className={styles.courseIdBadge}>강의 ID: {courseId}</span>
+
         </div>
 
         {/* 등록된 영상 목록 */}
